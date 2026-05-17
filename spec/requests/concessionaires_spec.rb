@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Concessionaires', type: :request do
@@ -26,13 +28,13 @@ RSpec.describe 'Concessionaires', type: :request do
       parameter name: :concessionaire, in: :body, schema: {
         type: :object,
         properties: {
-          name:    { type: :string },
+          name: { type: :string },
           acronym: { type: :string },
-          code:    { type: :string },
-          region:  { type: :string },
-          phone:   { type: :string },
-          email:   { type: :string },
-          active:  { type: :boolean }
+          code: { type: :string },
+          region: { type: :string },
+          phone: { type: :string },
+          email: { type: :string },
+          active: { type: :boolean }
         }
       }
 
@@ -101,13 +103,13 @@ RSpec.describe 'Concessionaires', type: :request do
       parameter name: :concessionaire, in: :body, schema: {
         type: :object,
         properties: {
-          name:    { type: :string },
+          name: { type: :string },
           acronym: { type: :string },
-          code:    { type: :string },
-          region:  { type: :string },
-          phone:   { type: :string },
-          email:   { type: :string },
-          active:  { type: :boolean }
+          code: { type: :string },
+          region: { type: :string },
+          phone: { type: :string },
+          email: { type: :string },
+          active: { type: :boolean }
         }
       }
 

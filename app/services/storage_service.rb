@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StorageService
   def initialize(bucket: S3_BUCKET)
     @client = Aws::S3::Client.new

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CucumberAuthHelpers
   def auth_header_for(user)
     "Bearer #{JsonWebToken.encode({ user_id: user.id })}"

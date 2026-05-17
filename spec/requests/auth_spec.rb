@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Auth', type: :request do
@@ -12,9 +14,9 @@ RSpec.describe 'Auth', type: :request do
         type: :object,
         required: %w[name email password],
         properties: {
-          name:     { type: :string },
-          email:    { type: :string },
-          profile:  { type: :string },
+          name: { type: :string },
+          email: { type: :string },
+          profile: { type: :string },
           password: { type: :string }
         }
       }
@@ -44,7 +46,7 @@ RSpec.describe 'Auth', type: :request do
         type: :object,
         required: %w[email password],
         properties: {
-          email:    { type: :string },
+          email: { type: :string },
           password: { type: :string }
         }
       }

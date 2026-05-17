@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Addresses', type: :request do
@@ -26,15 +28,15 @@ RSpec.describe 'Addresses', type: :request do
       parameter name: :address, in: :body, schema: {
         type: :object,
         properties: {
-          link:         { type: :string },
-          place:        { type: :string },
-          cep:          { type: :string },
-          number:       { type: :string },
-          address:      { type: :string },
-          complement:   { type: :string },
+          link: { type: :string },
+          place: { type: :string },
+          cep: { type: :string },
+          number: { type: :string },
+          address: { type: :string },
+          complement: { type: :string },
           neighborhood: { type: :string },
-          city:         { type: :string },
-          state:        { type: :string }
+          city: { type: :string },
+          state: { type: :string }
         }
       }
 
@@ -103,15 +105,15 @@ RSpec.describe 'Addresses', type: :request do
       parameter name: :address, in: :body, schema: {
         type: :object,
         properties: {
-          link:         { type: :string },
-          place:        { type: :string },
-          cep:          { type: :string },
-          number:       { type: :string },
-          address:      { type: :string },
-          complement:   { type: :string },
+          link: { type: :string },
+          place: { type: :string },
+          cep: { type: :string },
+          number: { type: :string },
+          address: { type: :string },
+          complement: { type: :string },
           neighborhood: { type: :string },
-          city:         { type: :string },
-          state:        { type: :string }
+          city: { type: :string },
+          state: { type: :string }
         }
       }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddAuditColumnsToTables < ActiveRecord::Migration[8.1]
   TABLES = %i[addresses customers concessionaires projects uploads].freeze
 

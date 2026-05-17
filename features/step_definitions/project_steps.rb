@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 # --- Contexto e autenticação ---
@@ -22,21 +24,33 @@ end
 Quando('faço GET em {string}') do |path|
   resolved = resolve_path(path)
   get resolved
-  @response_body = JSON.parse(last_response.body) rescue nil
+  @response_body = begin
+    JSON.parse(last_response.body)
+  rescue StandardError
+    nil
+  end
 end
 
 Quando('faço POST em {string} com os dados:') do |path, table|
   resolved = resolve_path(path)
   payload = build_payload(table.rows_hash)
   post resolved, payload.to_json, 'CONTENT_TYPE' => 'application/json'
-  @response_body = JSON.parse(last_response.body) rescue nil
+  @response_body = begin
+    JSON.parse(last_response.body)
+  rescue StandardError
+    nil
+  end
 end
 
 Quando('faço PATCH em {string} com os dados:') do |path, table|
   resolved = resolve_path(path)
   payload = build_payload(table.rows_hash)
   patch resolved, payload.to_json, 'CONTENT_TYPE' => 'application/json'
-  @response_body = JSON.parse(last_response.body) rescue nil
+  @response_body = begin
+    JSON.parse(last_response.body)
+  rescue StandardError
+    nil
+  end
 end
 
 Quando('faço DELETE em {string}') do |path|

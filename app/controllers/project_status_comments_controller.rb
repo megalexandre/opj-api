@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectStatusCommentsController < ApplicationController
   before_action :set_status
 

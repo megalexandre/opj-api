@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateProjectStatuses < ActiveRecord::Migration[8.1]
   def change
     create_table :project_statuses, id: :uuid do |t|
@@ -9,7 +11,7 @@ class CreateProjectStatuses < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :project_statuses, [ :project_id, :sequence ], unique: true
+    add_index :project_statuses, %i[project_id sequence], unique: true
     add_foreign_key :project_statuses, :users, column: :created_by
   end
 end

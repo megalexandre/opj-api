@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::API
   include Paginatable
   include Authenticatable
@@ -8,15 +10,15 @@ class ApplicationController < ActionController::API
   end
 
   rescue_from ActionDispatch::Http::Parameters::ParseError do
-    render json: { message: "Invalid JSON body" }, status: :bad_request
+    render json: { message: 'Invalid JSON body' }, status: :bad_request
   end
 
   rescue_from ActiveRecord::RecordInvalid do |e|
     render json: { message: e.message, errors: e.record.errors }, status: :unprocessable_content
   end
 
-  rescue_from ActiveRecord::InvalidForeignKey do |e|
-    render json: { message: "Invalid reference: associated record not found" }, status: :unprocessable_content
+  rescue_from ActiveRecord::InvalidForeignKey do |_|
+    render json: { message: 'Invalid reference: associated record not found' }, status: :unprocessable_content
   end
 
   rescue_from ActiveRecord::RecordNotFound do |e|

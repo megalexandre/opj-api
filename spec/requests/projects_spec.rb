@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Projects', type: :request do
@@ -28,24 +30,24 @@ RSpec.describe 'Projects', type: :request do
         required: %w[client_id utility_company utility_protocol customer_class
                      integrator modality framework unit_control project_type],
         properties: {
-          client_id:        { type: :string, format: :uuid },
-          address_id:       { type: :string, format: :uuid, nullable: true },
-          utility_company:  { type: :string },
+          client_id: { type: :string, format: :uuid },
+          address_id: { type: :string, format: :uuid, nullable: true },
+          utility_company: { type: :string },
           utility_protocol: { type: :string },
-          customer_class:   { type: :string },
-          integrator:       { type: :string },
-          modality:         { type: :string },
-          framework:        { type: :string },
-          status:           { type: :string },
-          amount:           { type: :number },
-          dc_protection:    { type: :string },
-          system_power:     { type: :number },
-          unit_control:     { type: :string },
-          description:      { type: :string },
-          project_type:     { type: :string },
-          fast_track:       { type: :boolean },
-          coordinates:      { type: :string, description: 'WKT — ex: "POINT(-43.9 -19.9)"' },
-          services_names:   { type: :array, items: { type: :string } }
+          customer_class: { type: :string },
+          integrator: { type: :string },
+          modality: { type: :string },
+          framework: { type: :string },
+          status: { type: :string },
+          amount: { type: :number },
+          dc_protection: { type: :string },
+          system_power: { type: :number },
+          unit_control: { type: :string },
+          description: { type: :string },
+          project_type: { type: :string },
+          fast_track: { type: :boolean },
+          coordinates: { type: :string, description: 'WKT — ex: "POINT(-43.9 -19.9)"' },
+          services_names: { type: :array, items: { type: :string } }
         }
       }
 
@@ -112,9 +114,9 @@ RSpec.describe 'Projects', type: :request do
       parameter name: :project, in: :body, schema: {
         type: :object,
         properties: {
-          status:      { type: :string },
+          status: { type: :string },
           description: { type: :string },
-          fast_track:  { type: :boolean },
+          fast_track: { type: :boolean },
           system_power: { type: :number }
         }
       }

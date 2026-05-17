@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ServicesController < ApplicationController
   before_action :set_service, only: %i[show update destroy]
 
@@ -56,11 +58,11 @@ class ServicesController < ApplicationController
       :discount_coupon_percentage, :observations, :supply_voltage, :coordinates,
       :generating_consumer_unit, :pole_distance_over_30m,
       :construction_address_id, :generating_address_id,
-      apportionments_attributes: [
-        :id, :consumer_unit, :address, :classification, :percentage, :_destroy
+      apportionments_attributes: %i[
+        id consumer_unit address classification percentage _destroy
       ],
-      service_entry_items_attributes: [
-        :id, :connection_type, :classification, :quantity, :circuit_breaker, :_destroy
+      service_entry_items_attributes: %i[
+        id connection_type classification quantity circuit_breaker _destroy
       ]
     )
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadsController < ApplicationController
   before_action :set_upload, only: %i[download destroy]
 
@@ -13,11 +15,11 @@ class UploadsController < ApplicationController
       result = storage.upload(key: key, io: file, content_type: file.content_type)
 
       Upload.create!(
-        item_id:  item_id,
+        item_id: item_id,
         filename: file.original_filename,
-        s3_url:   result[:url],
-        s3_key:   key,
-        size:     file.size
+        s3_url: result[:url],
+        s3_key: key,
+        size: file.size
       )
     end
 
@@ -34,7 +36,7 @@ class UploadsController < ApplicationController
   # GET /uploads/:id/download
   def download
     obj = StorageService.new.download(key: @upload.s3_key)
-    send_data(obj.body.read, filename: @upload.filename, type: obj.content_type, disposition: "attachment")
+    send_data(obj.body.read, filename: @upload.filename, type: obj.content_type, disposition: 'attachment')
   end
 
   # DELETE /uploads/:id

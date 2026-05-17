@@ -1,12 +1,14 @@
-require "rails_helper"
+# frozen_string_literal: true
+
+require 'rails_helper'
 
 RSpec.describe Address, type: :model do
-  describe "associations" do
+  describe 'associations' do
     it { is_expected.to have_one(:customer) }
   end
 
-  describe "restrict deletion when customer exists" do
-    it "does not destroy address that has a customer" do
+  describe 'restrict deletion when customer exists' do
+    it 'does not destroy address that has a customer' do
       customer = create(:customer)
       address = customer.address
 

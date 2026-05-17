@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AuthController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[register login]
 
@@ -23,12 +25,17 @@ class AuthController < ApplicationController
   def index
     users = User.all
     render json: users.map { |user| user_json(user) }
-  end 
+  end
 
   private
 
-  def register_params = params.permit(:name, :email, :profile, :password, :password_confirmation)
-  def login_params    = params.permit(:email, :password)
+  def register_params
+    params.permit(:name, :email, :profile, :password, :password_confirmation)
+  end
+
+  def login_params
+    params.permit(:email, :password)
+  end
 
   def user_json(user)
     user.as_json(only: %i[id name email profile created_at updated_at])

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
@@ -20,26 +22,25 @@ Rails.application.routes.draw do
       get :download
     end
     collection do
-      delete "by_item/:item_id", action: :destroy_by_item
+      delete 'by_item/:item_id', action: :destroy_by_item
     end
   end
-  
-  resources :concessionaires do 
-    get "paginate", on: :collection
+
+  resources :concessionaires do
+    get 'paginate', on: :collection
   end
 
-  resources :customers do 
-    get "paginate", on: :collection
+  resources :customers do
+    get 'paginate', on: :collection
   end
 
   resources :addresses do
-    get "paginate", on: :collection
+    get 'paginate', on: :collection
   end
 
   resources :services do
-    get "paginate", on: :collection
+    get 'paginate', on: :collection
   end
-  
-  get "up" => "rails/health#show", as: :rails_health_check
 
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectSerializer
   def initialize(project)
     @project = project

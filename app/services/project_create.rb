@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectCreate
   def initialize(params:, current_user:)
     @params = params

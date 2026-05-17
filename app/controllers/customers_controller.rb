@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class CustomersController < ApplicationController
-  before_action :set_customer, only: %i[ show update destroy ]
+  before_action :set_customer, only: %i[show update destroy]
 
   # GET /customers/paginate
   def paginate
@@ -44,19 +46,19 @@ class CustomersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_customer
-      @customer = Customer.includes(:address).find(params.expect(:id))
-      authorize_record!(@customer)
-    end
 
-    # Only allow a list of trusted parameters through.
-    def customer_params
-      raw = params.permit(:address_id, :name, :email, :tax_id, :phone,
-        address: [ :link, :place, :cep, :number, :address, :complement, :neighborhood, :city, :state ],
-        address_attributes: [ :link, :place, :cep, :number, :address, :complement, :neighborhood, :city, :state ]
-      )
-      raw[:address_attributes] ||= raw.delete(:address) if raw[:address]
-      raw
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_customer
+    @customer = Customer.includes(:address).find(params.expect(:id))
+    authorize_record!(@customer)
+  end
+
+  # Only allow a list of trusted parameters through.
+  def customer_params
+    raw = params.permit(:address_id, :name, :email, :tax_id, :phone,
+                        address: %i[link place cep number address complement neighborhood city state],
+                        address_attributes: %i[link place cep number address complement neighborhood city state])
+    raw[:address_attributes] ||= raw.delete(:address) if raw[:address]
+    raw
+  end
 end

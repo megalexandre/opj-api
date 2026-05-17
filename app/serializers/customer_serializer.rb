@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CustomerSerializer
   def initialize(customer)
     @customer = customer

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'json'
 
-SAMPLE_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+SAMPLE_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
 
 # --- Contexto ---
 
@@ -14,14 +16,22 @@ Quando('faço POST em {string} com logo em base64') do |path|
   resolved = resolve_concessionaire_path(path)
   payload = { name: 'Com Logo', active: true, logo: SAMPLE_LOGO }
   post resolved, payload.to_json, 'CONTENT_TYPE' => 'application/json'
-  @response_body = JSON.parse(last_response.body) rescue nil
+  @response_body = begin
+    JSON.parse(last_response.body)
+  rescue StandardError
+    nil
+  end
 end
 
 Quando('faço PATCH em {string} com logo em base64') do |path|
   resolved = resolve_concessionaire_path(path)
   payload = { logo: SAMPLE_LOGO }
   patch resolved, payload.to_json, 'CONTENT_TYPE' => 'application/json'
-  @response_body = JSON.parse(last_response.body) rescue nil
+  @response_body = begin
+    JSON.parse(last_response.body)
+  rescue StandardError
+    nil
+  end
 end
 
 # --- Asserções ---

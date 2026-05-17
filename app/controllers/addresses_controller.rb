@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AddressesController < ApplicationController
-  before_action :set_address, only: %i[ show update destroy ]
+  before_action :set_address, only: %i[show update destroy]
 
   # GET /addresses/paginate
   def paginate
@@ -48,14 +50,15 @@ class AddressesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_address
-      @address = Address.find(params.expect(:id))
-      authorize_record!(@address)
-    end
 
-    # Only allow a list of trusted parameters through.
-    def address_params
-      params.permit(:link, :place, :cep, :number, :address, :complement, :neighborhood, :city, :state)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_address
+    @address = Address.find(params.expect(:id))
+    authorize_record!(@address)
+  end
+
+  # Only allow a list of trusted parameters through.
+  def address_params
+    params.permit(:link, :place, :cep, :number, :address, :complement, :neighborhood, :city, :state)
+  end
 end

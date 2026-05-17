@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Dado('que existe um projeto com um status cadastrado') do
   @customer = create(:customer)
   @project  = create(:project, client: @customer)
@@ -15,4 +17,3 @@ end
 Então('o comentário não existe mais no banco') do
   expect(ProjectStatusComment.exists?(@comment.id)).to be false
 end
-

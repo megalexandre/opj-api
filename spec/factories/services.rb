@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :service do
     association :customer
     association :concessionaire
-    service_type             { "Ligação Nova" }
+    service_type             { 'Ligação Nova' }
     opening_date             { Date.today }
-    amount                   { "150.00" }
+    amount                   { '150.00' }
     discount_coupon_percentage { nil }
     observations             { nil }
     supply_voltage           { nil }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectStatusesController < ApplicationController
   before_action :set_project
 
@@ -37,10 +39,12 @@ class ProjectStatusesController < ApplicationController
 
   def serialize(status)
     {
-      id:         status.id,
-      name:       status.name,
+      id: status.id,
+      name: status.name,
       project_id: @project.id,
-      comments:   status.comments.map { |c| { id: c.id, body: c.body, created_by: c.created_by, created_at: c.created_at } },
+      comments: status.comments.map do |c|
+        { id: c.id, body: c.body, created_by: c.created_by, created_at: c.created_at }
+      end,
       created_by: status.created_by,
       created_at: status.created_at
     }

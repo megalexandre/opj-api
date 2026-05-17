@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Customers', type: :request do
@@ -26,17 +28,17 @@ RSpec.describe 'Customers', type: :request do
       parameter name: :customer, in: :body, schema: {
         type: :object,
         properties: {
-          name:       { type: :string },
-          email:      { type: :string },
-          tax_id:     { type: :string },
-          phone:      { type: :string },
+          name: { type: :string },
+          email: { type: :string },
+          tax_id: { type: :string },
+          phone: { type: :string },
           address_id: { type: :string, format: :uuid, description: 'Vincular endereço existente' },
           address_attributes: {
             type: :object,
             description: 'Criar endereço junto com o cliente',
             properties: {
               place: { type: :string }, cep: { type: :string }, number: { type: :string },
-              city:  { type: :string }, state: { type: :string }
+              city: { type: :string }, state: { type: :string }
             }
           }
         }
@@ -117,10 +119,10 @@ RSpec.describe 'Customers', type: :request do
       parameter name: :customer, in: :body, schema: {
         type: :object,
         properties: {
-          name:   { type: :string },
-          email:  { type: :string },
+          name: { type: :string },
+          email: { type: :string },
           tax_id: { type: :string },
-          phone:  { type: :string }
+          phone: { type: :string }
         }
       }
 

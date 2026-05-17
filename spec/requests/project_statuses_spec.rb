@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Project Statuses', type: :request do
@@ -40,7 +42,7 @@ RSpec.describe 'Project Statuses', type: :request do
         type: :object,
         required: ['name'],
         properties: {
-          name:    { type: :string, description: 'Nome do novo status' },
+          name: { type: :string, description: 'Nome do novo status' },
           comment: { type: :string, description: 'Comentário inicial (opcional)', nullable: true }
         }
       }

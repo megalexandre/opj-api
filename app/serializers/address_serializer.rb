@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddressSerializer
   def initialize(address)
     @address = address

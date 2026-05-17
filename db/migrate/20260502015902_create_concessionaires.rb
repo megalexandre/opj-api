@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateConcessionaires < ActiveRecord::Migration[8.1]
   def change
     create_table :concessionaires, id: :uuid do |t|

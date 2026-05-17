@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateProjectStatusComments < ActiveRecord::Migration[8.1]
   def change
     create_table :project_status_comments, id: :uuid do |t|

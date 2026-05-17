@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Concessionaire < ApplicationRecord
   include Auditable
   include ImageCompressible

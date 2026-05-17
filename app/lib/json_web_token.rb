@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JsonWebToken
   SECRET_KEY = ENV.fetch('JWT_SECRET_KEY') { Rails.application.secret_key_base }
   EXPIRY = 24.hours

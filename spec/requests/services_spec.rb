@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Services', type: :request do
@@ -26,27 +28,27 @@ RSpec.describe 'Services', type: :request do
       parameter name: :service, in: :body, schema: {
         type: :object,
         properties: {
-          service_type:               { type: :string },
-          customer_id:                { type: :string, format: :uuid },
-          concessionaire_id:          { type: :string, format: :uuid },
-          opening_date:               { type: :string, format: :date },
-          amount:                     { type: :string },
+          service_type: { type: :string },
+          customer_id: { type: :string, format: :uuid },
+          concessionaire_id: { type: :string, format: :uuid },
+          opening_date: { type: :string, format: :date },
+          amount: { type: :string },
           discount_coupon_percentage: { type: :integer },
-          observations:               { type: :string },
-          supply_voltage:             { type: :string },
-          generating_consumer_unit:   { type: :string },
-          pole_distance_over_30m:     { type: :boolean },
-          construction_address_id:    { type: :string, format: :uuid },
-          generating_address_id:      { type: :string, format: :uuid },
+          observations: { type: :string },
+          supply_voltage: { type: :string },
+          generating_consumer_unit: { type: :string },
+          pole_distance_over_30m: { type: :boolean },
+          construction_address_id: { type: :string, format: :uuid },
+          generating_address_id: { type: :string, format: :uuid },
           apportionments_attributes: {
             type: :array,
             items: {
               type: :object,
               properties: {
-                consumer_unit:  { type: :string },
-                address:        { type: :string },
+                consumer_unit: { type: :string },
+                address: { type: :string },
                 classification: { type: :string },
-                percentage:     { type: :integer }
+                percentage: { type: :integer }
               }
             }
           },
@@ -56,8 +58,8 @@ RSpec.describe 'Services', type: :request do
               type: :object,
               properties: {
                 connection_type: { type: :string },
-                classification:  { type: :string },
-                quantity:        { type: :integer },
+                classification: { type: :string },
+                quantity: { type: :integer },
                 circuit_breaker: { type: :string }
               }
             }
@@ -69,11 +71,11 @@ RSpec.describe 'Services', type: :request do
       response '201', 'serviço criado' do
         let(:service) do
           {
-            service_type:      'Ligação Nova',
-            customer_id:       create(:customer).id,
+            service_type: 'Ligação Nova',
+            customer_id: create(:customer).id,
             concessionaire_id: create(:concessionaire).id,
-            opening_date:      Date.today.iso8601,
-            amount:            '150.00'
+            opening_date: Date.today.iso8601,
+            amount: '150.00'
           }
         end
         schema '$ref' => '#/components/schemas/Service'
@@ -145,9 +147,9 @@ RSpec.describe 'Services', type: :request do
       parameter name: :service, in: :body, schema: {
         type: :object,
         properties: {
-          service_type:  { type: :string },
-          observations:  { type: :string },
-          amount:        { type: :string }
+          service_type: { type: :string },
+          observations: { type: :string },
+          amount: { type: :string }
         }
       }
 
