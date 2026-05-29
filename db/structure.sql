@@ -11,17 +11,17 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: api_data; Type: SCHEMA; Schema: -; Owner: -
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA api_data;
+CREATE SCHEMA public;
 
 
 --
--- Name: tiger; Type: SCHEMA; Schema: -; Owner: -
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
 --
 
-CREATE SCHEMA tiger;
+COMMENT ON SCHEMA public IS 'standard public schema';
 
 
 --
@@ -36,62 +36,6 @@ CREATE SCHEMA topology;
 --
 
 COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
-
-
---
--- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
-
-
---
--- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
-
-
---
--- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
-
-
---
--- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
-
-
---
--- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
-
-
---
--- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
-
-
---
--- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
-
-
---
--- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
 
 
 SET default_tablespace = '';
@@ -199,7 +143,9 @@ CREATE TABLE public.ledgers (
     reason character varying,
     description text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    created_by uuid,
+    updated_by uuid
 );
 
 
@@ -594,6 +540,14 @@ CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
 
 
 --
+-- Name: ledgers fk_rails_04e654b585; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledgers
+    ADD CONSTRAINT fk_rails_04e654b585 FOREIGN KEY (updated_by) REFERENCES public.users(id);
+
+
+--
 -- Name: services fk_rails_05e47ee6c3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -698,6 +652,14 @@ ALTER TABLE ONLY public.services
 
 
 --
+-- Name: ledgers fk_rails_720159e5c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledgers
+    ADD CONSTRAINT fk_rails_720159e5c3 FOREIGN KEY (created_by) REFERENCES public.users(id);
+
+
+--
 -- Name: addresses fk_rails_727063a9f1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -797,9 +759,10 @@ ALTER TABLE ONLY public.projects
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user", public, topology, tiger;
+SET search_path TO public,tiger,topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260529114700'),
 ('20260526230109'),
 ('20260516175644'),
 ('20260515164002'),
