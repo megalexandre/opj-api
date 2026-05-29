@@ -1,0 +1,142 @@
+{
+  "info": {
+    "name": "Ledgers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "SEU_TOKEN_AQUI",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Listar todos",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/ledgers",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers"]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Paginado",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/ledgers/paginate?page=1&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers", "paginate"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Buscar por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/ledgers/1",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers", "1"]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Criar",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/ledgers",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers"]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"project_id\": 1,\n  \"service_id\": 1,\n  \"amount_cents\": 150000\n}"
+        }
+      }
+    },
+    {
+      "name": "Atualizar",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{base_url}}/ledgers/1",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers", "1"]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount_cents\": 200000\n}"
+        }
+      }
+    },
+    {
+      "name": "Deletar",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/ledgers/1",
+          "host": ["{{base_url}}"],
+          "path": ["ledgers", "1"]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    }
+  ]
+}
