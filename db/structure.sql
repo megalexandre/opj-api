@@ -154,7 +154,7 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.concessionaires (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name character varying,
+    name character varying NOT NULL,
     acronym character varying,
     code character varying,
     region character varying,
@@ -184,6 +184,22 @@ CREATE TABLE public.customers (
     updated_at timestamp(6) without time zone NOT NULL,
     created_by uuid,
     updated_by uuid
+);
+
+
+--
+-- Name: ledgers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ledgers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    project_id uuid,
+    service_id uuid,
+    amount_cents integer DEFAULT 0 NOT NULL,
+    reason character varying,
+    description text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -373,6 +389,14 @@ ALTER TABLE ONLY public.customers
 
 
 --
+-- Name: ledgers ledgers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledgers
+    ADD CONSTRAINT ledgers_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: project_status_comments project_status_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -462,6 +486,20 @@ CREATE UNIQUE INDEX index_customers_on_email ON public.customers USING btree (em
 --
 
 CREATE UNIQUE INDEX index_customers_on_tax_id ON public.customers USING btree (tax_id);
+
+
+--
+-- Name: index_ledgers_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ledgers_on_project_id ON public.ledgers USING btree (project_id);
+
+
+--
+-- Name: index_ledgers_on_service_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ledgers_on_service_id ON public.ledgers USING btree (service_id);
 
 
 --
@@ -644,6 +682,14 @@ ALTER TABLE ONLY public.apportionments
 
 
 --
+-- Name: ledgers fk_rails_5be1bfd871; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledgers
+    ADD CONSTRAINT fk_rails_5be1bfd871 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: services fk_rails_611e8e49f6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -708,6 +754,14 @@ ALTER TABLE ONLY public.uploads
 
 
 --
+-- Name: ledgers fk_rails_bdbe062be5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledgers
+    ADD CONSTRAINT fk_rails_bdbe062be5 FOREIGN KEY (service_id) REFERENCES public.services(id);
+
+
+--
 -- Name: services fk_rails_c2bef342a7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -746,6 +800,8 @@ ALTER TABLE ONLY public.projects
 SET search_path TO "$user", public, topology, tiger;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260526230109'),
+('20260516175644'),
 ('20260515164002'),
 ('20260514120003'),
 ('20260514120002'),

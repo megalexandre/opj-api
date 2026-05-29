@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Authenticatable
   extend ActiveSupport::Concern
 
@@ -20,12 +22,14 @@ module Authenticatable
     render json: { message: 'User not found' }, status: :unauthorized
   end
 
-  def current_user = @current_user
+  def current_user
+    @current_user
+  end
 
   def extract_token_from_header
     header = request.headers['Authorization']
     raise JWT::DecodeError, 'Missing token' if header.blank?
 
-    header.split(' ').last
+    header.split.last
   end
 end

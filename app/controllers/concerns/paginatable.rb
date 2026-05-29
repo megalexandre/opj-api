@@ -17,7 +17,7 @@ module Paginatable
       numberOfElements: pagy.in,
       first: pagy.prev.nil?,
       last: pagy.next.nil?,
-      empty: pagy.count.zero?
+      empty: pagy.count.zero? # rubocop:disable Style/CollectionQuerying
     }, **options
   end
 end
