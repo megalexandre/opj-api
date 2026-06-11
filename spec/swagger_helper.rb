@@ -92,6 +92,7 @@ RSpec.configure do |config|
               utility_protocol: { type: :string },
               customer_class: { type: :string },
               integrator: { type: :string, format: :uuid, nullable: true },
+              integrator_name: { type: :string, nullable: true },
               modality: { type: :string },
               framework: { type: :string },
               status: { type: :string, nullable: true },

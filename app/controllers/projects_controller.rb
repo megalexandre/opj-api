@@ -6,7 +6,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   def index
-    @projects = Project.includes(statuses: :comments).visible_to(current_user)
+    @projects = Project.includes(:integrator_user, statuses: :comments).visible_to(current_user)
 
     render json: @projects.map { |p| ProjectSerializer.new(p).as_json }
   end

@@ -154,6 +154,11 @@ components:
           type: string
         integrator:
           type: string
+          format: uuid
+          nullable: true
+        integrator_name:
+          type: string
+          nullable: true
         modality:
           type: string
         framework:
@@ -187,6 +192,8 @@ components:
           items:
             type: string
           nullable: true
+        editable:
+          type: boolean
         created_at:
           type: string
           format: date-time
@@ -199,7 +206,6 @@ components:
       - utility_company
       - utility_protocol
       - customer_class
-      - integrator
       - modality
       - framework
       - unit_control
@@ -255,6 +261,125 @@ components:
           type: boolean
         empty:
           type: boolean
+    ProjectStatusComment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        body:
+          type: string
+        status_id:
+          type: string
+          format: uuid
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - body
+      - status_id
+    ProjectStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        project_id:
+          type: string
+          format: uuid
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              body:
+                type: string
+              created_by:
+                type: string
+                format: uuid
+                nullable: true
+              created_at:
+                type: string
+                format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - project_id
+    TechnicalDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        opening_date:
+          type: string
+          format: date
+          nullable: true
+        supply_voltage:
+          type: string
+          nullable: true
+        new_project:
+          type: boolean
+        zero_grid_control:
+          type: boolean
+        modules:
+          type: array
+          items:
+            type: string
+        inverters:
+          type: array
+          items:
+            type: string
+        entry_standard_items:
+          type: array
+          items:
+            type: string
+        credit_divisions:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - id
+      - project_id
+      - new_project
+      - zero_grid_control
     Error:
       type: object
       properties:
@@ -293,6 +418,139 @@ components:
       required:
       - token
       - user
+    Apportionment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_id:
+          type: string
+          format: uuid
+        consumer_unit:
+          type: string
+        address:
+          type: string
+        classification:
+          type: string
+        percentage:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - service_id
+      - consumer_unit
+      - address
+      - classification
+      - percentage
+    ServiceEntryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_id:
+          type: string
+          format: uuid
+        connection_type:
+          type: string
+        classification:
+          type: string
+        quantity:
+          type: integer
+        circuit_breaker:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - service_id
+      - connection_type
+      - classification
+      - quantity
+      - circuit_breaker
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_type:
+          type: string
+        customer_id:
+          type: string
+          format: uuid
+        concessionaire_id:
+          type: string
+          format: uuid
+        opening_date:
+          type: string
+          format: date
+        amount:
+          type: string
+        discount_coupon_percentage:
+          type: integer
+          nullable: true
+        observations:
+          type: string
+          nullable: true
+        supply_voltage:
+          type: string
+          nullable: true
+        coordinates:
+          "$ref": "#/components/schemas/Coordinates"
+        generating_consumer_unit:
+          type: string
+          nullable: true
+        pole_distance_over_30m:
+          type: boolean
+        construction_address_id:
+          type: string
+          format: uuid
+          nullable: true
+        generating_address_id:
+          type: string
+          format: uuid
+          nullable: true
+        apportionments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Apportionment"
+        service_entry_items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ServiceEntryItem"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - id
+      - service_type
+      - customer_id
+      - concessionaire_id
+      - opening_date
+      - amount
+      - pole_distance_over_30m
 paths:
   "/addresses":
     get:
@@ -997,6 +1255,219 @@ paths:
           description: removido com sucesso
         '404':
           description: não encontrado
+  "/projects/{project_id}/statuses/{status_id}/comments":
+    parameters:
+    - name: project_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: status_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    post:
+      summary: Adiciona um comentário ao status
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: comentário criado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectStatusComment"
+        '422':
+          description: body em branco
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '404':
+          description: status não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+  "/projects/{project_id}/statuses/{status_id}/comments/{id}":
+    parameters:
+    - name: project_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: status_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: Atualiza um comentário
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: comentário atualizado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectStatusComment"
+        '404':
+          description: comentário não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+    delete:
+      summary: Remove um comentário
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removido com sucesso
+        '404':
+          description: comentário não encontrado
+  "/projects/{project_id}/statuses":
+    parameters:
+    - name: project_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Lista os status do projeto
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista de status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ProjectStatus"
+        '404':
+          description: projeto não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    post:
+      summary: Registra um novo status no projeto
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: status registrado com comentário
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectStatus"
+        '422':
+          description: nome em branco
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '404':
+          description: projeto não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: Nome do novo status
+                comment:
+                  type: string
+                  description: Comentário inicial (opcional)
+                  nullable: true
   "/projects":
     get:
       summary: Lista todos os projetos
@@ -1056,7 +1527,6 @@ paths:
               - utility_company
               - utility_protocol
               - customer_class
-              - integrator
               - modality
               - framework
               - unit_control
@@ -1077,6 +1547,8 @@ paths:
                   type: string
                 integrator:
                   type: string
+                  format: uuid
+                  nullable: true
                 modality:
                   type: string
                 framework:
@@ -1190,6 +1662,431 @@ paths:
           description: removido com sucesso
         '404':
           description: não encontrado
+  "/services":
+    get:
+      summary: Lista todos os serviços
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista de serviços
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Service"
+    post:
+      summary: Cria um serviço
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: serviço criado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Service"
+        '422':
+          description: dados inválidos
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_type:
+                  type: string
+                customer_id:
+                  type: string
+                  format: uuid
+                concessionaire_id:
+                  type: string
+                  format: uuid
+                opening_date:
+                  type: string
+                  format: date
+                amount:
+                  type: string
+                discount_coupon_percentage:
+                  type: integer
+                observations:
+                  type: string
+                supply_voltage:
+                  type: string
+                generating_consumer_unit:
+                  type: string
+                pole_distance_over_30m:
+                  type: boolean
+                construction_address_id:
+                  type: string
+                  format: uuid
+                generating_address_id:
+                  type: string
+                  format: uuid
+                apportionments_attributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      consumer_unit:
+                        type: string
+                      address:
+                        type: string
+                      classification:
+                        type: string
+                      percentage:
+                        type: integer
+                service_entry_items_attributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      connection_type:
+                        type: string
+                      classification:
+                        type: string
+                      quantity:
+                        type: integer
+                      circuit_breaker:
+                        type: string
+              required:
+              - service_type
+              - customer_id
+              - concessionaire_id
+              - opening_date
+              - amount
+  "/services/paginate":
+    get:
+      summary: Lista serviços paginados
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página (começa em 1)
+        schema:
+          type: integer
+      - name: items
+        in: query
+        required: false
+        description: Itens por página
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: página de serviços
+          content:
+            application/json:
+              schema:
+                allOf:
+                - "$ref": "#/components/schemas/Page"
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/Service"
+  "/services/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Busca um serviço
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: serviço encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Service"
+        '404':
+          description: não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Atualiza um serviço
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: serviço atualizado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Service"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_type:
+                  type: string
+                observations:
+                  type: string
+                amount:
+                  type: string
+    delete:
+      summary: Remove um serviço
+      tags:
+      - Services
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removido com sucesso
+        '404':
+          description: não encontrado
+  "/projects/{project_id}/technical_details":
+    parameters:
+    - name: project_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Lista os detalhes técnicos do projeto
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista de detalhes técnicos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/TechnicalDetail"
+        '404':
+          description: projeto não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    post:
+      summary: Cria um detalhe técnico no projeto
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: detalhe técnico criado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TechnicalDetail"
+        '404':
+          description: projeto não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opening_date:
+                  type: string
+                  format: date
+                  nullable: true
+                supply_voltage:
+                  type: string
+                  nullable: true
+                new_project:
+                  type: boolean
+                zero_grid_control:
+                  type: boolean
+                modules:
+                  type: array
+                  items:
+                    type: string
+                inverters:
+                  type: array
+                  items:
+                    type: string
+                entry_standard_items:
+                  type: array
+                  items:
+                    type: string
+                credit_divisions:
+                  type: array
+                  items:
+                    type: string
+  "/projects/{project_id}/technical_details/{id}":
+    parameters:
+    - name: project_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Mostra um detalhe técnico
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: detalhe técnico encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TechnicalDetail"
+        '404':
+          description: detalhe técnico não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Atualiza um detalhe técnico
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: detalhe técnico atualizado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TechnicalDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                supply_voltage:
+                  type: string
+                zero_grid_control:
+                  type: boolean
+                inverters:
+                  type: array
+                  items:
+                    type: string
+    delete:
+      summary: Remove um detalhe técnico
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removido com sucesso
   "/uploads":
     post:
       summary: Faz upload de arquivos vinculados a um item
