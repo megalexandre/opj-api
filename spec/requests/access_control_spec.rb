@@ -199,4 +199,48 @@ RSpec.describe 'Access Control', type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe 'technical details' do
+    let!(:project_a) { Project.find_by(created_by: user_a.id) }
+    let(:payload) { { supply_voltage: '220V' }.to_json }
+    let(:json_headers) { { 'Content-Type' => 'application/json' } }
+
+    it 'owner can create a technical detail' do
+      post "/projects/#{project_a.id}/technical_details",
+           params: payload, headers: headers_a.merge(json_headers)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'main can create a technical detail on any project' do
+      post "/projects/#{project_a.id}/technical_details",
+           params: payload, headers: main_headers.merge(json_headers)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'non-owner cannot create and gets 404' do
+      post "/projects/#{project_a.id}/technical_details",
+           params: payload, headers: headers_b.merge(json_headers)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    context 'when the project is assigned to an integrator' do
+      let!(:assigned_project) do
+        Current.user = main_user
+        project = create(:project, integrator: user_b.id)
+        Current.user = nil
+        project
+      end
+
+      it 'integrator can list technical details' do
+        get "/projects/#{assigned_project.id}/technical_details", headers: headers_b
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'integrator cannot create and gets 404' do
+        post "/projects/#{assigned_project.id}/technical_details",
+             params: payload, headers: headers_b.merge(json_headers)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

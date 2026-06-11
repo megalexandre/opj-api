@@ -262,6 +262,28 @@ CREATE TABLE public.services (
 
 
 --
+-- Name: technical_details; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.technical_details (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    project_id uuid NOT NULL,
+    opening_date date,
+    supply_voltage character varying,
+    new_project boolean DEFAULT false NOT NULL,
+    zero_grid_control boolean DEFAULT false NOT NULL,
+    modules character varying[] DEFAULT '{}'::character varying[],
+    inverters character varying[] DEFAULT '{}'::character varying[],
+    entry_standard_items character varying[] DEFAULT '{}'::character varying[],
+    credit_divisions character varying[] DEFAULT '{}'::character varying[],
+    created_by uuid,
+    updated_by uuid,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: uploads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -388,6 +410,14 @@ ALTER TABLE ONLY public.service_entry_items
 
 ALTER TABLE ONLY public.services
     ADD CONSTRAINT services_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: technical_details technical_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.technical_details
+    ADD CONSTRAINT technical_details_pkey PRIMARY KEY (id);
 
 
 --
@@ -533,6 +563,13 @@ CREATE INDEX index_services_on_generating_address_id ON public.services USING bt
 
 
 --
+-- Name: index_technical_details_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_technical_details_on_project_id ON public.technical_details USING btree (project_id);
+
+
+--
 -- Name: index_uploads_on_item_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -632,6 +669,14 @@ ALTER TABLE ONLY public.customers
 
 ALTER TABLE ONLY public.addresses
     ADD CONSTRAINT fk_rails_4aa2d705a5 FOREIGN KEY (created_by) REFERENCES public.users(id);
+
+
+--
+-- Name: technical_details fk_rails_4f5fcda2d1; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.technical_details
+    ADD CONSTRAINT fk_rails_4f5fcda2d1 FOREIGN KEY (project_id) REFERENCES public.projects(id);
 
 
 --
@@ -777,6 +822,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO public,tiger,topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260610130000'),
 ('20260610120000'),
 ('20260529114700'),
 ('20260526230109'),

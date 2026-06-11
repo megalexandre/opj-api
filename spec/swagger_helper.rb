@@ -173,6 +173,26 @@ RSpec.configure do |config|
             },
             required: %w[id name project_id]
           },
+          TechnicalDetail: {
+            type: :object,
+            properties: {
+              id: { type: :string, format: :uuid },
+              project_id: { type: :string, format: :uuid },
+              opening_date: { type: :string, format: :date, nullable: true },
+              supply_voltage: { type: :string, nullable: true },
+              new_project: { type: :boolean },
+              zero_grid_control: { type: :boolean },
+              modules: { type: :array, items: { type: :string } },
+              inverters: { type: :array, items: { type: :string } },
+              entry_standard_items: { type: :array, items: { type: :string } },
+              credit_divisions: { type: :array, items: { type: :string } },
+              created_at: { type: :string, format: :'date-time' },
+              updated_at: { type: :string, format: :'date-time' },
+              created_by: { type: :string, format: :uuid, nullable: true },
+              updated_by: { type: :string, format: :uuid, nullable: true }
+            },
+            required: %w[id project_id new_project zero_grid_control]
+          },
           Error: {
             type: :object,
             properties: {

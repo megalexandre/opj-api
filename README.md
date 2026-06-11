@@ -1,3 +1,11 @@
+### Build e push
+
+```bash
+docker build -t alexandreqrz/opjapi:latest . &&
+docker push alexandreqrz/opjapi:latest
+```
+
+
 # OPJ API
 
 API REST para gerenciamento de projetos de conexão elétrica — clientes, concessionárias, serviços, rateios e uploads de arquivos.
@@ -66,11 +74,7 @@ rails server -b 0.0.0.0
 
 ## Docker
 
-### Build e push
 
-```bash
-docker build -t alexandreqrz/opjapi:latest . &&
-docker push alexandreqrz/opjapi:latest
 ```
 
 ### Subir tudo com docker-compose

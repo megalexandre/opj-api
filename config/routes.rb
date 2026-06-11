@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     resources :statuses, only: %i[index create], controller: 'project_statuses' do
       resources :comments, only: %i[create update destroy], controller: 'project_status_comments'
     end
+    resources :technical_details, only: %i[index show create update destroy]
   end
 
   resources :uploads, only: %i[index create destroy] do

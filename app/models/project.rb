@@ -9,6 +9,7 @@ class Project < ApplicationRecord
                                inverse_of: false
 
   has_many :statuses, class_name: 'ProjectStatus', dependent: :destroy
+  has_many :technical_details, dependent: :destroy
 
   scope :visible_to, lambda { |user|
     next all if user.profile == 'main'
