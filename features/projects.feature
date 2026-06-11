@@ -1,6 +1,7 @@
 # language: pt
 
 Funcionalidade: Gerenciamento de Projetos
+
   Como um usuário autenticado
   Quero gerenciar projetos
   Para acompanhar o ciclo de vida dos projetos de energia solar
@@ -21,7 +22,6 @@ Funcionalidade: Gerenciamento de Projetos
       | utility_company  | CEMIG          |
       | utility_protocol | P-001          |
       | customer_class   | B1             |
-      | integrator       | Integrador X   |
       | modality         | Micro          |
       | framework        | NET            |
       | unit_control     | UC-001         |
@@ -37,7 +37,6 @@ Funcionalidade: Gerenciamento de Projetos
       | utility_company  | CEMIG          |
       | utility_protocol | P-002          |
       | customer_class   | B1             |
-      | integrator       | Integrador Y   |
       | modality         | Mini           |
       | framework        | NET            |
       | unit_control     | UC-002         |
@@ -53,7 +52,6 @@ Funcionalidade: Gerenciamento de Projetos
       | utility_company  | CEMIG                                |
       | utility_protocol | P-003                                |
       | customer_class   | B1                                   |
-      | integrator       | Integrador Z                         |
       | modality         | Micro                                |
       | framework        | NET                                  |
       | unit_control     | UC-003                               |
@@ -71,13 +69,15 @@ Funcionalidade: Gerenciamento de Projetos
     Então o status da resposta é 404
 
   Cenário: Atualizar um projeto
-    Dado que existe um projeto cadastrado
+    Dado que estou autenticado como administrador
+    E que existe um projeto cadastrado
     Quando faço PATCH em "/projects/<project_id>" com os dados:
       | fast_track | true |
     Então o status da resposta é 200
 
   Cenário: Remover um projeto
-    Dado que existe um projeto cadastrado
+    Dado que estou autenticado como administrador
+    E que existe um projeto cadastrado
     Quando faço DELETE em "/projects/<project_id>"
     Então o status da resposta é 204
     E o projeto não existe mais no banco

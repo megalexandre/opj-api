@@ -32,6 +32,8 @@ RSpec.describe 'Project Statuses', type: :request do
     end
 
     post 'Registra um novo status no projeto' do
+      let(:user) { create(:user, profile: 'main') }
+
       tags 'Projects'
       consumes 'application/json'
       produces 'application/json'

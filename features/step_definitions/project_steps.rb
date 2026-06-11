@@ -10,6 +10,12 @@ Dado('que estou autenticado como usuário') do
   Current.user = @user
 end
 
+Dado('que estou autenticado como administrador') do
+  @user = create(:user, profile: 'main')
+  set_auth_header(@user)
+  Current.user = @user
+end
+
 Dado('que existe um cliente cadastrado') do
   @customer = create(:customer)
 end

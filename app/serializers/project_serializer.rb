@@ -32,7 +32,8 @@ class ProjectSerializer
       created_at: @project.created_at,
       updated_at: @project.updated_at,
       created_by: @project.created_by,
-      updated_by: @project.updated_by
+      updated_by: @project.updated_by,
+      editable: Current.user&.profile == 'main'
     }
   end
 

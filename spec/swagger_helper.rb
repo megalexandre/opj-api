@@ -91,7 +91,7 @@ RSpec.configure do |config|
               utility_company: { type: :string },
               utility_protocol: { type: :string },
               customer_class: { type: :string },
-              integrator: { type: :string },
+              integrator: { type: :string, format: :uuid, nullable: true },
               modality: { type: :string },
               framework: { type: :string },
               status: { type: :string, nullable: true },
@@ -104,11 +104,12 @@ RSpec.configure do |config|
               fast_track: { type: :boolean },
               coordinates: { '$ref' => '#/components/schemas/Coordinates' },
               services_names: { type: :array, items: { type: :string }, nullable: true },
+              editable: { type: :boolean },
               created_at: { type: :string, format: :'date-time' },
               updated_at: { type: :string, format: :'date-time' }
             },
             required: %w[id client_id utility_company utility_protocol customer_class
-                         integrator modality framework unit_control project_type fast_track]
+                         modality framework unit_control project_type fast_track]
           },
           Upload: {
             type: :object,

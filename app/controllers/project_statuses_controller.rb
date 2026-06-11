@@ -2,6 +2,7 @@
 
 class ProjectStatusesController < ApplicationController
   before_action :set_project
+  before_action :authorize_main!, only: :create
 
   def index
     statuses = @project.statuses.includes(:comments).order(created_at: :asc)
@@ -30,7 +31,7 @@ class ProjectStatusesController < ApplicationController
 
   def set_project
     @project = Project.find(params[:project_id])
-    authorize_record!(@project)
+    authorize_view!(@project)
   end
 
   def status_params

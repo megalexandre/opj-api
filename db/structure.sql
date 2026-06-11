@@ -188,7 +188,6 @@ CREATE TABLE public.projects (
     utility_company character varying NOT NULL,
     utility_protocol character varying NOT NULL,
     customer_class character varying NOT NULL,
-    integrator character varying NOT NULL,
     modality character varying NOT NULL,
     framework character varying NOT NULL,
     status character varying,
@@ -206,7 +205,8 @@ CREATE TABLE public.projects (
     created_by uuid,
     updated_by uuid,
     sequence integer,
-    subsequence character varying
+    subsequence character varying,
+    integrator uuid
 );
 
 
@@ -477,6 +477,13 @@ CREATE INDEX index_projects_on_client_id ON public.projects USING btree (client_
 
 
 --
+-- Name: index_projects_on_integrator; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_integrator ON public.projects USING btree (integrator);
+
+
+--
 -- Name: index_projects_on_sequence_with_subsequence; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -732,6 +739,14 @@ ALTER TABLE ONLY public.services
 
 
 --
+-- Name: projects fk_rails_dad18dabe3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.projects
+    ADD CONSTRAINT fk_rails_dad18dabe3 FOREIGN KEY (integrator) REFERENCES public.users(id);
+
+
+--
 -- Name: concessionaires fk_rails_e6922b7e80; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -762,6 +777,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO public,tiger,topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260610120000'),
 ('20260529114700'),
 ('20260526230109'),
 ('20260516175644'),

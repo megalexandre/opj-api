@@ -7,7 +7,7 @@ FactoryBot.define do
     utility_company  { 'CEMIG' }
     utility_protocol { 'PROT-001' }
     customer_class   { 'B1' }
-    integrator       { 'Integrador X' }
+    integrator       { nil }
     modality         { 'Micro' }
     framework        { 'NET' }
     status           { 'pendente' }

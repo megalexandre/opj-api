@@ -6,7 +6,7 @@ Funcionalidade: Status de Projetos
   Para manter o histórico completo do ciclo de vida
 
   Contexto:
-    Dado que estou autenticado como usuário
+    Dado que estou autenticado como administrador
     E que existe um projeto cadastrado
 
   Cenário: Listar status do projeto

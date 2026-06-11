@@ -22,7 +22,8 @@ RSpec.describe 'Access Control', type: :request do
   describe 'GET /projects (index)' do
     it 'main sees all projects' do
       get '/projects', headers: main_headers
-      expect(JSON.parse(response.body).size).to eq(2)
+      ids = JSON.parse(response.body).map { |p| p['created_by'] }
+      expect(ids).to include(user_a.id, user_b.id)
     end
 
     it 'non-main sees only own projects' do
@@ -34,6 +35,16 @@ RSpec.describe 'Access Control', type: :request do
     it 'non-main sees only own count' do
       get '/projects', headers: headers_b
       expect(JSON.parse(response.body).size).to eq(1)
+    end
+
+    it 'main sees projects as editable' do
+      get '/projects', headers: main_headers
+      expect(JSON.parse(response.body).map { |p| p['editable'] }).to all(be(true))
+    end
+
+    it 'non-main sees projects as not editable' do
+      get '/projects', headers: headers_a
+      expect(JSON.parse(response.body).map { |p| p['editable'] }).to all(be(false))
     end
   end
 
@@ -59,11 +70,18 @@ RSpec.describe 'Access Control', type: :request do
   describe 'PATCH /projects/:id (update)' do
     let!(:project_a) { Project.find_by(created_by: user_a.id) }
 
-    it 'owner can update own project' do
+    it 'main can update any project' do
+      patch "/projects/#{project_a.id}",
+            params: { status: 'aprovado' }.to_json,
+            headers: main_headers.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'owner gets 403' do
       patch "/projects/#{project_a.id}",
             params: { status: 'aprovado' }.to_json,
             headers: headers_a.merge('Content-Type' => 'application/json')
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'non-owner gets 404' do
@@ -77,13 +95,107 @@ RSpec.describe 'Access Control', type: :request do
   describe 'DELETE /projects/:id (destroy)' do
     let!(:project_a) { Project.find_by(created_by: user_a.id) }
 
-    it 'owner can delete own project' do
-      delete "/projects/#{project_a.id}", headers: headers_a
+    it 'main can delete any project' do
+      delete "/projects/#{project_a.id}", headers: main_headers
       expect(response).to have_http_status(:no_content)
+    end
+
+    it 'owner gets 403' do
+      delete "/projects/#{project_a.id}", headers: headers_a
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'non-owner gets 404' do
       delete "/projects/#{project_a.id}", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'POST /projects/:project_id/statuses (kanban move)' do
+    let!(:project_a) { Project.find_by(created_by: user_a.id) }
+
+    it 'main can create a status on any project' do
+      post "/projects/#{project_a.id}/statuses",
+           params: { name: 'aprovado' }.to_json,
+           headers: main_headers.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'owner gets 403' do
+      post "/projects/#{project_a.id}/statuses",
+           params: { name: 'aprovado' }.to_json,
+           headers: headers_a.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'non-owner gets 404' do
+      post "/projects/#{project_a.id}/statuses",
+           params: { name: 'aprovado' }.to_json,
+           headers: headers_b.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'GET /projects/:project_id/statuses (index)' do
+    let!(:project_a) { Project.find_by(created_by: user_a.id) }
+
+    it 'owner can list statuses' do
+      get "/projects/#{project_a.id}/statuses", headers: headers_a
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'non-owner gets 404' do
+      get "/projects/#{project_a.id}/statuses", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'project assigned to an integrator' do
+    let!(:assigned_project) do
+      Current.user = main_user
+      project = create(:project, integrator: user_a.id)
+      Current.user = nil
+      project
+    end
+
+    it 'integrator sees the project in the kanban list' do
+      get '/projects', headers: headers_a
+      ids = JSON.parse(response.body).map { |p| p['id'] }
+      expect(ids).to include(assigned_project.id)
+    end
+
+    it 'integrator can show the project' do
+      get "/projects/#{assigned_project.id}", headers: headers_a
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)['editable']).to be(false)
+    end
+
+    it 'integrator can list project statuses' do
+      get "/projects/#{assigned_project.id}/statuses", headers: headers_a
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'integrator cannot update the project' do
+      patch "/projects/#{assigned_project.id}",
+            params: { description: 'mudou' }.to_json,
+            headers: headers_a.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'integrator cannot delete the project' do
+      delete "/projects/#{assigned_project.id}", headers: headers_a
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'integrator cannot move the project on the kanban' do
+      post "/projects/#{assigned_project.id}/statuses",
+           params: { name: 'aprovado' }.to_json,
+           headers: headers_a.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'other non-main users still get 404' do
+      get "/projects/#{assigned_project.id}", headers: headers_b
       expect(response).to have_http_status(:not_found)
     end
   end

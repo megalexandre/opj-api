@@ -2,10 +2,11 @@
 
 class ProjectsController < ApplicationController
   before_action :set_project, only: %i[show update destroy]
+  before_action :authorize_main!, only: %i[update destroy]
 
   # GET /projects
   def index
-    @projects = apply_access_scope(Project.includes(statuses: :comments))
+    @projects = Project.includes(statuses: :comments).visible_to(current_user)
 
     render json: @projects.map { |p| ProjectSerializer.new(p).as_json }
   end
@@ -40,7 +41,7 @@ class ProjectsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_project
     @project = Project.includes(statuses: :comments).find(params.expect(:id))
-    authorize_record!(@project)
+    authorize_view!(@project)
   end
 
   def create_params

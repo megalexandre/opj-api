@@ -28,14 +28,14 @@ RSpec.describe 'Projects', type: :request do
       parameter name: :project, in: :body, schema: {
         type: :object,
         required: %w[client_id utility_company utility_protocol customer_class
-                     integrator modality framework unit_control project_type],
+                     modality framework unit_control project_type],
         properties: {
           client_id: { type: :string, format: :uuid },
           address_id: { type: :string, format: :uuid, nullable: true },
           utility_company: { type: :string },
           utility_protocol: { type: :string },
           customer_class: { type: :string },
-          integrator: { type: :string },
+          integrator: { type: :string, format: :uuid, nullable: true },
           modality: { type: :string },
           framework: { type: :string },
           status: { type: :string },
@@ -56,13 +56,13 @@ RSpec.describe 'Projects', type: :request do
           customer = create(:customer)
           {
             client_id: customer.id, utility_company: 'CEMIG', utility_protocol: 'P001',
-            customer_class: 'B1', integrator: 'Int X', modality: 'Micro',
+            customer_class: 'B1', integrator: create(:user).id, modality: 'Micro',
             framework: 'NET', unit_control: 'UC-1', project_type: 'Residencial'
           }
         end
         schema '$ref' => '#/components/schemas/Project'
         run_test! do
-          created = Project.last
+          created = Project.find(JSON.parse(response.body)['id'])
           expect(created.created_by).to eq(user.id)
           expect(created.updated_by).to eq(user.id)
         end
@@ -72,7 +72,7 @@ RSpec.describe 'Projects', type: :request do
         let(:project) do
           {
             client_id: SecureRandom.uuid, utility_company: 'CEMIG', utility_protocol: 'P001',
-            customer_class: 'B1', integrator: 'Int X', modality: 'Micro',
+            customer_class: 'B1', modality: 'Micro',
             framework: 'NET', unit_control: 'UC-1', project_type: 'Residencial'
           }
         end
@@ -105,6 +105,8 @@ RSpec.describe 'Projects', type: :request do
     end
 
     patch 'Atualiza um projeto' do
+      let(:user) { create(:user, profile: 'main') }
+
       tags 'Projects'
       consumes 'application/json'
       produces 'application/json'
@@ -132,6 +134,8 @@ RSpec.describe 'Projects', type: :request do
     end
 
     delete 'Remove um projeto' do
+      let(:user) { create(:user, profile: 'main') }
+
       tags 'Projects'
       security [{ bearerAuth: [] }]
       parameter name: :Authorization, in: :header, type: :string, required: true, description: 'Bearer token'
