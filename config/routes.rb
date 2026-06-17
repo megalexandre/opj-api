@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :users, only: [:destroy]
+  resources :users, only: [:destroy] do
+    member do
+      patch :reset_password
+    end
+  end
 
   resources :ledgers do
     get 'paginate', on: :collection
