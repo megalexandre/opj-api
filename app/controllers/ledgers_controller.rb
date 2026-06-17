@@ -69,6 +69,6 @@ class LedgersController < ApplicationController
   end
 
   def ledger_params
-    params.permit(:project_id, :service_id, :amount, :reason, :description)
+    params.permit(:project_id, :service_id, :amount, :reason, :description, :paid_at)
   end
 end

@@ -145,7 +145,8 @@ CREATE TABLE public.ledgers (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     created_by uuid,
-    updated_by uuid
+    updated_by uuid,
+    paid_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -822,6 +823,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO public,tiger,topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260616120000'),
 ('20260610130000'),
 ('20260610120000'),
 ('20260529114700'),

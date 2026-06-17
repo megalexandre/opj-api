@@ -14,6 +14,7 @@ class LedgerSerializer
       amount_cents: @ledger.amount_cents,
       reason: @ledger.reason,
       description: @ledger.description,
+      paid_at: @ledger.paid_at,
       created_at: @ledger.created_at,
       updated_at: @ledger.updated_at
     }
