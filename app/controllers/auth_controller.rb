@@ -2,6 +2,7 @@
 
 class AuthController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[register login]
+  before_action :authorize_main!, only: :index
 
   def register
     user = User.new(register_params)

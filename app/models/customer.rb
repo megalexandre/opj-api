@@ -3,7 +3,7 @@
 class Customer < ApplicationRecord
   include Auditable
 
-  belongs_to :address, optional: true
+  belongs_to :address
   accepts_nested_attributes_for :address
 
   validates :email, uniqueness: { case_sensitive: false }, allow_blank: true

@@ -41,8 +41,9 @@ class UploadsController < ApplicationController
 
   # DELETE /uploads/:id
   def destroy
-    StorageService.new.delete(key: @upload.s3_key)
+    s3_key = @upload.s3_key
     @upload.destroy!
+    StorageService.new.delete(key: s3_key)
     head :no_content
   end
 

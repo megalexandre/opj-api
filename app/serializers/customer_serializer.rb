@@ -12,7 +12,7 @@ class CustomerSerializer
       email: @customer.email,
       tax_id: @customer.tax_id,
       phone: @customer.phone,
-      address: AddressSerializer.new(@customer.address).as_json,
+      address: @customer.address ? AddressSerializer.new(@customer.address).as_json : nil,
       created_at: @customer.created_at,
       updated_at: @customer.updated_at,
       created_by: @customer.created_by,
