@@ -29,7 +29,7 @@ class UploadsController < ApplicationController
   # GET /uploads?item_id=<uuid>
   def index
     item_id  = params.expect(:item_id)
-    @uploads = apply_access_scope(Upload.where(item_id: item_id))
+    @uploads = upload_scope_for(item_id)
     render json: @uploads.map { |u| UploadSerializer.new(u).as_json }
   end
 
@@ -61,6 +61,31 @@ class UploadsController < ApplicationController
 
   def set_upload
     @upload = Upload.find(params.expect(:id))
-    authorize_record!(@upload)
+    authorize_upload_access!(@upload)
+  end
+
+  def upload_scope_for(item_id)
+    return Upload.where(item_id: item_id) if current_user.admin?
+
+    if Project.where(id: item_id)
+              .where("created_by = :uid OR integrator = :uid", uid: current_user.id)
+              .exists?
+      Upload.where(item_id: item_id)
+    else
+      Upload.where(item_id: item_id, created_by: current_user.id)
+    end
+  end
+
+  def authorize_upload_access!(upload)
+    return if current_user.admin?
+    return if upload.created_by == current_user.id
+
+    if Project.where(id: upload.item_id)
+              .where("created_by = :uid OR integrator = :uid", uid: current_user.id)
+              .exists?
+      return
+    end
+
+    raise ActiveRecord::RecordNotFound
   end
 end

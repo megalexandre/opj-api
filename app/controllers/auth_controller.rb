@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class AuthController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[register login]
-  before_action :authorize_main!, only: :index
+  skip_before_action :authenticate_user!, only: %i[login]
+  before_action :authorize_main!, only: %i[index register]
 
   def register
     user = User.new(register_params)

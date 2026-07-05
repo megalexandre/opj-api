@@ -1,6 +1,7 @@
 # language: pt
 
 Funcionalidade: Gerenciamento de Concessionárias
+
   Como um usuário autenticado
   Quero gerenciar concessionárias
   Para associá-las aos serviços de energia solar

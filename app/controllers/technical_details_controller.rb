@@ -2,7 +2,7 @@
 
 class TechnicalDetailsController < ApplicationController
   before_action :set_project
-  before_action -> { authorize_record!(@project) }, only: %i[create update destroy]
+  before_action -> { authorize_project_participant!(@project) }, only: %i[create update destroy]
   before_action :set_technical_detail, only: %i[show update destroy]
 
   # GET /projects/1/technical_details

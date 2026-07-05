@@ -34,6 +34,6 @@ class UsersController < ApplicationController
   end
 
   def require_main_profile!
-    render json: { message: 'Forbidden' }, status: :forbidden unless current_user.profile == 'main'
+    render json: { message: 'Forbidden' }, status: :forbidden unless current_user.admin?
   end
 end

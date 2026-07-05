@@ -54,7 +54,7 @@ class AddressesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_address
     @address = Address.find(params.expect(:id))
-    authorize_record!(@address)
+    #authorize_record!(@address)
   end
 
   # Only allow a list of trusted parameters through.

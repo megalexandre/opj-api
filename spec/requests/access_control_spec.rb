@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Access Control', type: :request do
-  let(:main_user) { create(:user, profile: 'main') }
+  let(:main_user) { create(:user, profile: 'admin') }
   let(:user_a)    { create(:user, profile: 'user') }
   let(:user_b)    { create(:user, profile: 'user') }
 
@@ -236,11 +236,63 @@ RSpec.describe 'Access Control', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'integrator cannot create and gets 404' do
+      it 'integrator can create technical details' do
         post "/projects/#{assigned_project.id}/technical_details",
              params: payload, headers: headers_b.merge(json_headers)
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'integrator can update technical details' do
+        Current.user = main_user
+        td = assigned_project.technical_details.create!(supply_voltage: '110V')
+        Current.user = nil
+
+        patch "/projects/#{assigned_project.id}/technical_details/#{td.id}",
+              params: { supply_voltage: '220V' }.to_json,
+              headers: headers_b.merge(json_headers)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'integrator can delete technical details' do
+        Current.user = main_user
+        td = assigned_project.technical_details.create!(supply_voltage: '110V')
+        Current.user = nil
+
+        delete "/projects/#{assigned_project.id}/technical_details/#{td.id}",
+               headers: headers_b
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it 'other user cannot create on assigned project' do
+        post "/projects/#{assigned_project.id}/technical_details",
+             params: payload, headers: headers_a.merge(json_headers)
         expect(response).to have_http_status(:not_found)
       end
+    end
+  end
+
+  describe 'POST /auth/register' do
+    it 'unauthenticated user gets 401' do
+      post '/auth/register',
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           headers: { 'Content-Type' => 'application/json' }
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'regular user gets 403' do
+      post '/auth/register',
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           headers: headers_a.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'admin can create a new user' do
+      post '/auth/register',
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           headers: main_headers.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:created)
+      body = JSON.parse(response.body)
+      expect(body['user']['profile']).to eq('user')
     end
   end
 end

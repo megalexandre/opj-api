@@ -12,12 +12,12 @@ class Project < ApplicationRecord
   has_many :technical_details, dependent: :destroy
 
   scope :visible_to, lambda { |user|
-    next all if user.profile == 'main'
+    next all if user.admin?
 
     where(created_by: user.id).or(where(integrator: user.id))
   }
 
   def visible_to?(user)
-    user.profile == 'main' || created_by == user.id || integrator == user.id
+    user.admin? || created_by == user.id || integrator == user.id
   end
 end

@@ -30,7 +30,7 @@ class ProjectStatusCommentsController < ApplicationController
 
   def set_status
     project = Project.find(params[:project_id])
-    authorize_record!(project)
+    authorize_project_participant!(project)
     @status = project.statuses.find(params[:status_id])
   end
 
