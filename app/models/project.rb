@@ -7,6 +7,7 @@ class Project < ApplicationRecord
   belongs_to :address, optional: true
   belongs_to :integrator_user, class_name: 'User', foreign_key: :integrator, optional: true,
                                inverse_of: false
+  belongs_to :related_project, class_name: 'Project', optional: true, inverse_of: false
 
   has_many :statuses, class_name: 'ProjectStatus', dependent: :destroy
   has_many :technical_details, dependent: :destroy

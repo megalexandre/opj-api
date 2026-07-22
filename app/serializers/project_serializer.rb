@@ -29,6 +29,7 @@ class ProjectSerializer
       services_names: @project.services_names,
       sequence: @project.sequence,
       subsequence: @project.subsequence,
+      related_project_id: @project.related_project_id,
       statuses: serialize_statuses(@project.statuses),
       created_at: @project.created_at,
       updated_at: @project.updated_at,
