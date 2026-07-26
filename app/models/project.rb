@@ -12,6 +12,8 @@ class Project < ApplicationRecord
   has_many :statuses, class_name: 'ProjectStatus', dependent: :destroy
   has_many :technical_details, dependent: :destroy
 
+  default_scope { where(deleted_at: nil) }
+
   scope :visible_to, lambda { |user|
     next all if user.admin?
 

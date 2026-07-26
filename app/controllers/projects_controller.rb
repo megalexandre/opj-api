@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[show update destroy]
-  before_action :authorize_main!, only: %i[update destroy]
+  before_action :set_project, only: %i[show update destroy inactivate]
+  before_action :authorize_main!, only: %i[update destroy inactivate]
 
   # GET /projects
   def index
@@ -34,6 +34,11 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   def destroy
     @project.destroy!
+  end
+
+  # PATCH /projects/1/inactivate
+  def inactivate
+    @project.update!(deleted_at: Time.current)
   end
 
   private

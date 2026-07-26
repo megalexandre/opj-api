@@ -10,33 +10,13 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
-CREATE SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS postgis_topology;
 
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 
---
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA public IS 'standard public schema';
-
-
---
--- Name: topology; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA topology;
-
-
---
--- Name: SCHEMA topology; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
-
+CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;
 
 SET default_tablespace = '';
 
@@ -208,7 +188,8 @@ CREATE TABLE public.projects (
     sequence integer,
     subsequence character varying,
     integrator uuid,
-    related_project_id uuid
+    related_project_id uuid,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -506,6 +487,13 @@ CREATE INDEX index_projects_on_address_id ON public.projects USING btree (addres
 --
 
 CREATE INDEX index_projects_on_client_id ON public.projects USING btree (client_id);
+
+
+--
+-- Name: index_projects_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_deleted_at ON public.projects USING btree (deleted_at);
 
 
 --
@@ -839,6 +827,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO public,tiger,topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260726120000'),
 ('20260722120000'),
 ('20260622120000'),
 ('20260617091239'),

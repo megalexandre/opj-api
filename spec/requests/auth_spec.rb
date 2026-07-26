@@ -3,12 +3,17 @@
 require 'swagger_helper'
 
 RSpec.describe 'Auth', type: :request do
+  include_context 'with auth token'
+
   path '/auth/register' do
     post 'Registra um novo usuário' do
+      let(:user) { create(:user, profile: 'admin') }
+
       tags 'Auth'
       consumes 'application/json'
       produces 'application/json'
-      security []
+      security [{ bearerAuth: [] }]
+      parameter name: :Authorization, in: :header, type: :string, required: true, description: 'Bearer token'
 
       parameter name: :credentials, in: :body, schema: {
         type: :object,

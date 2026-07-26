@@ -105,7 +105,7 @@ RSpec.describe 'Projects', type: :request do
     end
 
     patch 'Atualiza um projeto' do
-      let(:user) { create(:user, profile: 'main') }
+      let(:user) { create(:user, profile: 'admin') }
 
       tags 'Projects'
       consumes 'application/json'
@@ -134,7 +134,7 @@ RSpec.describe 'Projects', type: :request do
     end
 
     delete 'Remove um projeto' do
-      let(:user) { create(:user, profile: 'main') }
+      let(:user) { create(:user, profile: 'admin') }
 
       tags 'Projects'
       security [{ bearerAuth: [] }]
@@ -143,6 +143,32 @@ RSpec.describe 'Projects', type: :request do
       response '204', 'removido com sucesso' do
         let(:id) { create(:project).id }
         run_test!
+      end
+
+      response '404', 'não encontrado' do
+        let(:id) { SecureRandom.uuid }
+        schema '$ref' => '#/components/schemas/Error'
+        run_test!
+      end
+    end
+  end
+
+  path '/projects/{id}/inactivate' do
+    parameter name: :id, in: :path, type: :string, format: :uuid, required: true
+
+    patch 'Inativa um projeto' do
+      let(:user) { create(:user, profile: 'admin') }
+
+      tags 'Projects'
+      security [{ bearerAuth: [] }]
+      parameter name: :Authorization, in: :header, type: :string, required: true, description: 'Bearer token'
+
+      response '204', 'projeto inativado' do
+        let(:id) { create(:project).id }
+        run_test! do
+          expect(Project.unscoped.find(id).deleted_at).to be_present
+          expect(Project.find_by(id: id)).to be_nil
+        end
       end
 
       response '404', 'não encontrado' do

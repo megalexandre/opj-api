@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   end
 
   resources :projects do
+    member do
+      patch :inactivate
+    end
     resources :statuses, only: %i[index create], controller: 'project_statuses' do
       resources :comments, only: %i[create update destroy], controller: 'project_status_comments'
     end
