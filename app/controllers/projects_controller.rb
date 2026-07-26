@@ -50,15 +50,15 @@ class ProjectsController < ApplicationController
   end
 
   def create_params
-    params.permit(:client_id, :address_id, :utility_company, :utility_protocol, :customer_class,
-                  :integrator, :modality, :framework, :status, :amount, :dc_protection,
+    params.permit(:client_id, :address_id, :utility_company, :utility_protocol, :secondary_protocol,
+                  :customer_class, :integrator, :modality, :framework, :status, :amount, :dc_protection,
                   :system_power, :unit_control, :description, :project_type, :fast_track,
                   :coordinates, :sequence, :subsequence, :related_project_id, services_names: [])
   end
 
   def update_params
-    params.permit(:client_id, :address_id, :utility_company, :utility_protocol, :customer_class,
-                  :integrator, :modality, :framework, :amount, :dc_protection,
+    params.permit(:client_id, :address_id, :utility_company, :utility_protocol, :secondary_protocol,
+                  :customer_class, :integrator, :modality, :framework, :amount, :dc_protection,
                   :system_power, :unit_control, :description, :project_type, :fast_track,
                   :coordinates, :sequence, :subsequence, :related_project_id, services_names: [])
   end

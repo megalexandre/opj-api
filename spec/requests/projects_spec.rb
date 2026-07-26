@@ -34,6 +34,7 @@ RSpec.describe 'Projects', type: :request do
           address_id: { type: :string, format: :uuid, nullable: true },
           utility_company: { type: :string },
           utility_protocol: { type: :string },
+          secondary_protocol: { type: :string },
           customer_class: { type: :string },
           integrator: { type: :string, format: :uuid, nullable: true },
           modality: { type: :string },

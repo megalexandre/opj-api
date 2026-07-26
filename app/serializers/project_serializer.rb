@@ -12,6 +12,7 @@ class ProjectSerializer
       address_id: @project.address_id,
       utility_company: @project.utility_company,
       utility_protocol: @project.utility_protocol,
+      secondary_protocol: @project.secondary_protocol,
       customer_class: @project.customer_class,
       integrator: @project.integrator,
       integrator_name: @project.integrator_user&.name,
