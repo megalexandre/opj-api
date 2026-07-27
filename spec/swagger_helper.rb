@@ -210,6 +210,22 @@ RSpec.configure do |config|
             },
             required: %w[id date content]
           },
+          Ledger: {
+            type: :object,
+            properties: {
+              id: { type: :string, format: :uuid },
+              project_id: { type: :string, format: :uuid, nullable: true },
+              service_id: { type: :string, format: :uuid, nullable: true },
+              amount: { type: :string },
+              amount_cents: { type: :integer },
+              reason: { type: :string, nullable: true },
+              description: { type: :string, nullable: true },
+              paid_at: { type: :string, format: :'date-time' },
+              created_at: { type: :string, format: :'date-time' },
+              updated_at: { type: :string, format: :'date-time' }
+            },
+            required: %w[id amount amount_cents]
+          },
           Error: {
             type: :object,
             properties: {

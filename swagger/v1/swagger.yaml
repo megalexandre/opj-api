@@ -418,6 +418,43 @@ components:
       - id
       - date
       - content
+    Ledger:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+          nullable: true
+        service_id:
+          type: string
+          format: uuid
+          nullable: true
+        amount:
+          type: string
+        amount_cents:
+          type: integer
+        reason:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - amount
+      - amount_cents
     Error:
       type: object
       properties:
@@ -1458,6 +1495,229 @@ paths:
           description: removido com sucesso
         '404':
           description: não encontrado
+  "/ledgers":
+    get:
+      summary: Lista todos os lançamentos
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista de lançamentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Ledger"
+    post:
+      summary: Cria um lançamento
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: lançamento criado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ledger"
+        '422':
+          description: formato de valor inválido
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                service_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                amount:
+                  type: string
+                reason:
+                  type: string
+                description:
+                  type: string
+                paid_at:
+                  type: string
+                  format: date-time
+              required:
+              - amount
+  "/ledgers/paginate":
+    get:
+      summary: Lista lançamentos paginados
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página (começa em 1)
+        schema:
+          type: integer
+      - name: items
+        in: query
+        required: false
+        description: Itens por página
+        schema:
+          type: integer
+      - name: project_id
+        in: query
+        format: uuid
+        required: false
+        schema:
+          type: string
+      - name: service_id
+        in: query
+        format: uuid
+        required: false
+        schema:
+          type: string
+      - name: reason
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: from
+        in: query
+        format: date-time
+        required: false
+        schema:
+          type: string
+      - name: to
+        in: query
+        format: date-time
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: página de lançamentos
+          content:
+            application/json:
+              schema:
+                allOf:
+                - "$ref": "#/components/schemas/Page"
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/Ledger"
+  "/ledgers/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Mostra um lançamento
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lançamento encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ledger"
+        '404':
+          description: não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Atualiza um lançamento
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lançamento atualizado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Ledger"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                description:
+                  type: string
+    delete:
+      summary: Remove um lançamento
+      tags:
+      - Ledgers
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removido com sucesso
   "/projects/{project_id}/statuses/{status_id}/comments":
     parameters:
     - name: project_id
@@ -2469,3 +2729,77 @@ paths:
                     type: integer
                 required:
                 - deleted
+  "/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    delete:
+      summary: Remove um usuário
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: usuário removido
+        '403':
+          description: usuário sem permissão
+        '404':
+          description: não encontrado
+  "/users/{id}/reset_password":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: Redefine a senha de um usuário
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: senha redefinida
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '403':
+          description: usuário sem permissão
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: confirmação de senha não confere
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                password_confirmation:
+                  type: string
