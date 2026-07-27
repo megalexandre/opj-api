@@ -150,6 +150,62 @@ RSpec.describe 'Calendar Events', type: :request do
       get "/calendar_events/#{other_event.id}", headers: { 'Authorization' => auth_token_for(user) }
       expect(response).to have_http_status(:not_found)
     end
+
+    it 'não permite atualizar evento de outro usuário' do
+      patch "/calendar_events/#{other_event.id}",
+            params: { content: { title: 'Invadido' } }.to_json,
+            headers: { 'Authorization' => auth_token_for(user), 'Content-Type' => 'application/json' }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'não permite remover evento de outro usuário' do
+      expect do
+        delete "/calendar_events/#{other_event.id}", headers: { 'Authorization' => auth_token_for(user) }
+      end.not_to change(CalendarEvent, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'não lista evento de outro usuário no índice' do
+      get '/calendar_events', headers: { 'Authorization' => auth_token_for(user) }
+      ids = JSON.parse(response.body).map { |e| e['id'] }
+      expect(ids).not_to include(other_event.id)
+    end
+
+    it 'admin vê eventos de todos os usuários no índice' do
+      admin = create(:user, profile: 'admin')
+      get '/calendar_events', headers: { 'Authorization' => auth_token_for(admin) }
+      ids = JSON.parse(response.body).map { |e| e['id'] }
+      expect(ids).to include(other_event.id)
+    end
+  end
+
+  describe 'vínculo com projeto e filtros parciais de data' do
+    it 'aceita project_id opcional na criação' do
+      project = create(:project)
+      post '/calendar_events',
+           params: { date: '2026-07-26', project_id: project.id, content: {} }.to_json,
+           headers: { 'Authorization' => auth_token_for(user), 'Content-Type' => 'application/json' }
+      expect(response).to have_http_status(:created)
+      expect(JSON.parse(response.body)['project_id']).to eq(project.id)
+    end
+
+    it 'filtra somente com from' do
+      create(:calendar_event, date: '2026-07-10')
+      create(:calendar_event, date: '2026-07-20')
+      get '/calendar_events', params: { from: '2026-07-15' },
+                               headers: { 'Authorization' => auth_token_for(user) }
+      dates = JSON.parse(response.body).map { |e| e['date'] }
+      expect(dates).to eq(['2026-07-20'])
+    end
+
+    it 'filtra somente com to' do
+      create(:calendar_event, date: '2026-07-10')
+      create(:calendar_event, date: '2026-07-20')
+      get '/calendar_events', params: { to: '2026-07-15' },
+                               headers: { 'Authorization' => auth_token_for(user) }
+      dates = JSON.parse(response.body).map { |e| e['date'] }
+      expect(dates).to eq(['2026-07-10'])
+    end
   end
 
   private
