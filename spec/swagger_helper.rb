@@ -13,6 +13,7 @@ RSpec.configure do |config|
         version: 'v1'
       },
       servers: [
+        { url: 'https://www.projetosopjengenharia.com.br/api/v2', description: 'Produção' },
         { url: 'http://localhost:3000', description: 'Desenvolvimento' }
       ],
       security: [{ bearerAuth: [] }],
