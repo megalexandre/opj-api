@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resources :ledgers do
     get 'paginate', on: :collection
   end
+
+  resources :calendar_events
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
 

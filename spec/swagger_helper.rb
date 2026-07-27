@@ -195,6 +195,20 @@ RSpec.configure do |config|
             },
             required: %w[id project_id new_project zero_grid_control]
           },
+          CalendarEvent: {
+            type: :object,
+            properties: {
+              id: { type: :string, format: :uuid },
+              project_id: { type: :string, format: :uuid, nullable: true },
+              date: { type: :string, format: :date },
+              content: { type: :object },
+              created_by: { type: :string, format: :uuid, nullable: true },
+              updated_by: { type: :string, format: :uuid, nullable: true },
+              created_at: { type: :string, format: :'date-time' },
+              updated_at: { type: :string, format: :'date-time' }
+            },
+            required: %w[id date content]
+          },
           Error: {
             type: :object,
             properties: {

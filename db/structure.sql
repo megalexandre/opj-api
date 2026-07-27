@@ -142,6 +142,22 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: calendar_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.calendar_events (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    date date NOT NULL,
+    content jsonb DEFAULT '{}'::jsonb NOT NULL,
+    project_id uuid,
+    created_by uuid,
+    updated_by uuid,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: concessionaires; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -394,6 +410,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: calendar_events calendar_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.calendar_events
+    ADD CONSTRAINT calendar_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: concessionaires concessionaires_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -494,6 +518,20 @@ ALTER TABLE ONLY public.users
 --
 
 CREATE INDEX index_apportionments_on_service_id ON public.apportionments USING btree (service_id);
+
+
+--
+-- Name: index_calendar_events_on_date; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_calendar_events_on_date ON public.calendar_events USING btree (date);
+
+
+--
+-- Name: index_calendar_events_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_calendar_events_on_project_id ON public.calendar_events USING btree (project_id);
 
 
 --
@@ -875,6 +913,14 @@ ALTER TABLE ONLY public.concessionaires
 
 
 --
+-- Name: calendar_events fk_rails_ea84aebf24; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.calendar_events
+    ADD CONSTRAINT fk_rails_ea84aebf24 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: uploads fk_rails_eb1978731c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -897,6 +943,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO "$user", public, topology, tiger;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260727002520'),
 ('20260726130000'),
 ('20260726120000'),
 ('20260722120000'),

@@ -150,6 +150,9 @@ components:
           type: string
         utility_protocol:
           type: string
+        secondary_protocol:
+          type: string
+          nullable: true
         customer_class:
           type: string
         integrator:
@@ -380,6 +383,39 @@ components:
       - project_id
       - new_project
       - zero_grid_control
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+          nullable: true
+        date:
+          type: string
+          format: date
+        content:
+          type: object
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - date
+      - content
     Error:
       type: object
       properties:
@@ -760,8 +796,15 @@ paths:
       summary: Registra um novo usuário
       tags:
       - Auth
-      security: []
-      parameters: []
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
       responses:
         '201':
           description: usuário criado e token retornado
@@ -853,6 +896,164 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Error"
+  "/calendar_events":
+    get:
+      summary: Lista os eventos do calendário em um período
+      tags:
+      - Calendar Events
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      - name: from
+        in: query
+        format: date
+        required: false
+        description: Data inicial (inclusive)
+        schema:
+          type: string
+      - name: to
+        in: query
+        format: date
+        required: false
+        description: Data final (inclusive)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista completa sem filtro, incluindo vários itens na mesma
+            data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/CalendarEvent"
+    post:
+      summary: Cria um evento no calendário
+      tags:
+      - Calendar Events
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: evento criado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CalendarEvent"
+        '422':
+          description: data ausente
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                content:
+                  type: object
+              required:
+              - date
+  "/calendar_events/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Mostra um evento do calendário
+      tags:
+      - Calendar Events
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: evento encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CalendarEvent"
+        '404':
+          description: evento não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Atualiza um evento do calendário
+      tags:
+      - Calendar Events
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: evento atualizado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CalendarEvent"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                content:
+                  type: object
+    delete:
+      summary: Remove um evento do calendário
+      tags:
+      - Calendar Events
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removido com sucesso
   "/concessionaires":
     get:
       summary: Lista todas as concessionárias
@@ -1543,6 +1744,8 @@ paths:
                   type: string
                 utility_protocol:
                   type: string
+                secondary_protocol:
+                  type: string
                 customer_class:
                   type: string
                 integrator:
@@ -1660,6 +1863,32 @@ paths:
       responses:
         '204':
           description: removido com sucesso
+        '404':
+          description: não encontrado
+  "/projects/{id}/inactivate":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: Inativa um projeto
+      tags:
+      - Projects
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: projeto inativado
         '404':
           description: não encontrado
   "/services":
