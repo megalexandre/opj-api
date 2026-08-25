@@ -45,7 +45,7 @@ class ProjectsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_project
-    @project = Project.includes(statuses: :comments).find(params.expect(:id))
+    @project = Project.includes(:client, statuses: :comments).find(params.expect(:id))
     authorize_view!(@project)
   end
 

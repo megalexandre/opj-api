@@ -9,6 +9,7 @@ class ProjectSerializer
     {
       id: @project.id,
       client_id: @project.client_id,
+      client: @project.client_id ? CustomerSerializer.new(@project.client).as_json : nil,
       address_id: @project.address_id,
       utility_company: @project.utility_company,
       utility_protocol: @project.utility_protocol,

@@ -74,6 +74,18 @@ RSpec.configure do |config|
             },
             required: %w[id]
           },
+          PriceTable: {
+            type: :object,
+            properties: {
+              id: { type: :string, format: :uuid },
+              kind: { type: :string, enum: PriceTable::KINDS },
+              name: { type: :string },
+              values: { type: :array, items: { type: :object } },
+              created_at: { type: :string, format: :'date-time' },
+              updated_at: { type: :string, format: :'date-time' }
+            },
+            required: %w[id kind name]
+          },
           Coordinates: {
             type: :object,
             nullable: true,

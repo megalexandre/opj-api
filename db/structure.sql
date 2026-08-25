@@ -216,6 +216,22 @@ CREATE TABLE public.ledgers (
 
 
 --
+-- Name: price_tables; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.price_tables (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    kind character varying NOT NULL,
+    name character varying NOT NULL,
+    "values" jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_by uuid,
+    updated_by uuid,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: project_status_comments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -442,6 +458,14 @@ ALTER TABLE ONLY public.ledgers
 
 
 --
+-- Name: price_tables price_tables_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.price_tables
+    ADD CONSTRAINT price_tables_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: project_status_comments project_status_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -567,6 +591,13 @@ CREATE INDEX index_ledgers_on_project_id ON public.ledgers USING btree (project_
 --
 
 CREATE INDEX index_ledgers_on_service_id ON public.ledgers USING btree (service_id);
+
+
+--
+-- Name: index_price_tables_on_kind; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_price_tables_on_kind ON public.price_tables USING btree (kind);
 
 
 --
@@ -943,6 +974,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO "$user", public, topology, tiger;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260825120000'),
 ('20260727002520'),
 ('20260726130000'),
 ('20260726120000'),

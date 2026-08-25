@@ -57,5 +57,9 @@ Rails.application.routes.draw do
     get 'paginate', on: :collection
   end
 
+  resources :price_tables do
+    get 'paginate', on: :collection
+  end
+
   get 'up' => 'rails/health#show', as: :rails_health_check
 end

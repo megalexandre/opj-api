@@ -122,6 +122,35 @@ components:
           format: date-time
       required:
       - id
+    PriceTable:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - fotovoltaico
+          - padrao_entrada
+          - cupom_projeto
+          - cupom_servico
+        name:
+          type: string
+        values:
+          type: array
+          items:
+            type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - kind
+      - name
     Coordinates:
       type: object
       nullable: true
@@ -1718,6 +1747,205 @@ paths:
       responses:
         '204':
           description: removido com sucesso
+  "/price_tables":
+    get:
+      summary: Lista todas as tabelas de preço
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      - name: kind
+        in: query
+        required: false
+        description: Filtra por tipo
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lista de tabelas de preço
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PriceTable"
+    post:
+      summary: Cria uma tabela de preço
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '201':
+          description: tabela de preço criada
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/PriceTable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  type: string
+                  enum:
+                  - fotovoltaico
+                  - padrao_entrada
+                  - cupom_projeto
+                  - cupom_servico
+                name:
+                  type: string
+                values:
+                  type: array
+                  items:
+                    type: object
+  "/price_tables/paginate":
+    get:
+      summary: Lista tabelas de preço paginadas
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página (começa em 1)
+        schema:
+          type: integer
+      - name: items
+        in: query
+        required: false
+        description: Itens por página
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: página de tabelas de preço
+          content:
+            application/json:
+              schema:
+                allOf:
+                - "$ref": "#/components/schemas/Page"
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/PriceTable"
+  "/price_tables/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Busca uma tabela de preço
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: tabela de preço encontrada
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/PriceTable"
+        '404':
+          description: não encontrado
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Atualiza uma tabela de preço
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: tabela de preço atualizada
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/PriceTable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  type: string
+                  enum:
+                  - fotovoltaico
+                  - padrao_entrada
+                  - cupom_projeto
+                  - cupom_servico
+                name:
+                  type: string
+                values:
+                  type: array
+                  items:
+                    type: object
+    delete:
+      summary: Remove uma tabela de preço
+      tags:
+      - PriceTables
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token
+        schema:
+          type: string
+      responses:
+        '204':
+          description: removida com sucesso
+        '404':
+          description: não encontrado
   "/projects/{project_id}/statuses/{status_id}/comments":
     parameters:
     - name: project_id
