@@ -11,7 +11,7 @@ class LedgersController < ApplicationController
 
   # GET /ledgers
   def index
-    @ledgers = apply_access_scope(Ledger.all)
+    @ledgers = apply_access_scope(Ledger.includes(:project, :service))
     render json: @ledgers.map { LedgerSerializer.new(_1).as_json }
   end
 
@@ -53,7 +53,7 @@ class LedgersController < ApplicationController
   end
 
   def filtered_ledgers
-    filter_by_date_range(filter_by_attributes(Ledger.all)).order(created_at: :desc)
+    filter_by_date_range(filter_by_attributes(Ledger.includes(:project, :service))).order(created_at: :desc)
   end
 
   def filter_by_attributes(scope)

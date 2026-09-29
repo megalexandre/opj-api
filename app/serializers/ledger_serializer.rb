@@ -9,7 +9,9 @@ class LedgerSerializer
     {
       id: @ledger.id,
       project_id: @ledger.project_id,
+      project: @ledger.project ? ProjectSerializer.new(@ledger.project).as_json : nil,
       service_id: @ledger.service_id,
+      service: @ledger.service ? ServiceSerializer.new(@ledger.service).as_json : nil,
       amount: @ledger.amount.format,
       amount_cents: @ledger.amount_cents,
       reason: @ledger.reason,

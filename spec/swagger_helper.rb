@@ -227,7 +227,9 @@ RSpec.configure do |config|
             properties: {
               id: { type: :string, format: :uuid },
               project_id: { type: :string, format: :uuid, nullable: true },
+              project: { allOf: [{ '$ref' => '#/components/schemas/Project' }], nullable: true },
               service_id: { type: :string, format: :uuid, nullable: true },
+              service: { allOf: [{ '$ref' => '#/components/schemas/Service' }], nullable: true },
               amount: { type: :string },
               amount_cents: { type: :integer },
               reason: { type: :string, nullable: true },
