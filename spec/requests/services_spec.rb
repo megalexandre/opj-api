@@ -40,6 +40,14 @@ RSpec.describe 'Services', type: :request do
           pole_distance_over_30m: { type: :boolean },
           construction_address_id: { type: :string, format: :uuid },
           generating_address_id: { type: :string, format: :uuid },
+          protocol: { type: :string },
+          status: { type: :string },
+          timeline: { type: :string },
+          timeline_comments: { type: :string },
+          reference_point: { type: :string },
+          approval_status: { type: :string },
+          document_category: { type: :string },
+          reused_documents: { type: :string },
           apportionments_attributes: {
             type: :array,
             items: {

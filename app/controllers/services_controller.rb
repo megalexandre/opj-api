@@ -58,6 +58,8 @@ class ServicesController < ApplicationController
       :discount_coupon_percentage, :observations, :supply_voltage, :coordinates,
       :generating_consumer_unit, :pole_distance_over_30m,
       :construction_address_id, :generating_address_id,
+      :protocol, :status, :timeline, :timeline_comments, :reference_point,
+      :approval_status, :document_category, :reused_documents,
       apportionments_attributes: %i[
         id consumer_unit address classification percentage _destroy
       ],
