@@ -2,16 +2,17 @@
 
 class ConcessionairesController < ApplicationController
   before_action :set_concessionaire, only: %i[show update destroy]
+  before_action -> { authorize!(Concessionaire) }, only: %i[index paginate create]
 
   # GET /concessionaires/paginate
   def paginate
-    @pagy, @concessionaires = pagy(Concessionaire.all)
+    @pagy, @concessionaires = pagy(policy_scope(Concessionaire.all))
     render_page @pagy, @concessionaires, serializer: ConcessionaireSerializer
   end
 
   # GET /concessionaires
   def index
-    @concessionaires = Concessionaire.all
+    @concessionaires = policy_scope(Concessionaire.all)
 
     render json: @concessionaires
   end
@@ -51,7 +52,7 @@ class ConcessionairesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_concessionaire
     @concessionaire = Concessionaire.find(params.expect(:id))
-    authorize_record!(@concessionaire)
+    authorize!(@concessionaire)
   end
 
   # Only allow a list of trusted parameters through.

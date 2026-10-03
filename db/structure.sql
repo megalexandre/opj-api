@@ -342,7 +342,15 @@ CREATE TABLE public.services (
     created_by uuid,
     updated_by uuid,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    protocol character varying,
+    status character varying,
+    timeline character varying,
+    timeline_comments character varying,
+    reference_point character varying,
+    approval_status character varying,
+    document_category character varying,
+    reused_documents character varying
 );
 
 
@@ -395,7 +403,7 @@ CREATE TABLE public.users (
     name character varying NOT NULL,
     email character varying NOT NULL,
     password_digest character varying NOT NULL,
-    profile character varying DEFAULT 'user'::character varying NOT NULL,
+    profile character varying DEFAULT 'integrator'::character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -971,9 +979,11 @@ ALTER TABLE ONLY public.projects
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user", public, topology, tiger;
+SET search_path TO "$user", public, tiger, topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260929120000'),
+('20260928120000'),
 ('20260825120000'),
 ('20260727002520'),
 ('20260726130000'),

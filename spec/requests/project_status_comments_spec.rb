@@ -65,7 +65,7 @@ RSpec.describe 'Project Status Comments', type: :request do
       }
 
       response '200', 'comentário atualizado' do
-        let(:comment) { create(:project_status_comment, project_status: status_record) }
+        let(:comment) { create(:project_status_comment, project_status: status_record, created_by: user.id) }
         let(:id)      { comment.id }
         let(:body)    { { body: 'Texto atualizado' } }
         schema '$ref' => '#/components/schemas/ProjectStatusComment'
@@ -86,7 +86,7 @@ RSpec.describe 'Project Status Comments', type: :request do
       parameter name: :Authorization, in: :header, type: :string, required: true, description: 'Bearer token'
 
       response '204', 'removido com sucesso' do
-        let(:comment) { create(:project_status_comment, project_status: status_record) }
+        let(:comment) { create(:project_status_comment, project_status: status_record, created_by: user.id) }
         let(:id)      { comment.id }
         run_test!
       end

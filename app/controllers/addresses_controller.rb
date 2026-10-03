@@ -2,16 +2,17 @@
 
 class AddressesController < ApplicationController
   before_action :set_address, only: %i[show update destroy]
+  before_action -> { authorize!(Address) }, only: %i[index paginate create]
 
   # GET /addresses/paginate
   def paginate
-    @pagy, @addresses = pagy(apply_access_scope(Address.all))
+    @pagy, @addresses = pagy(policy_scope(Address.all))
     render_page @pagy, @addresses, serializer: AddressSerializer
   end
 
   # GET /addresses
   def index
-    @addresses = apply_access_scope(Address.all)
+    @addresses = policy_scope(Address.all)
     render json: @addresses.map { AddressSerializer.new(_1) }
   end
 
@@ -54,7 +55,7 @@ class AddressesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_address
     @address = Address.find(params.expect(:id))
-    #authorize_record!(@address)
+    authorize!(@address)
   end
 
   # Only allow a list of trusted parameters through.

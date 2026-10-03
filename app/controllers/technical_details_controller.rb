@@ -2,8 +2,8 @@
 
 class TechnicalDetailsController < ApplicationController
   before_action :set_project
-  before_action -> { authorize_project_participant!(@project) }, only: %i[create update destroy]
   before_action :set_technical_detail, only: %i[show update destroy]
+  before_action -> { authorize!(TechnicalDetail) }, only: %i[index create]
 
   # GET /projects/1/technical_details
   def index
@@ -45,11 +45,11 @@ class TechnicalDetailsController < ApplicationController
 
   def set_project
     @project = Project.find(params[:project_id])
-    authorize_view!(@project)
+    authorize!(@project, :show)
   end
 
   def set_technical_detail
-    @technical_detail = @project.technical_details.find(params.expect(:id))
+    @technical_detail = authorize!(@project.technical_details.find(params.expect(:id)))
   end
 
   def technical_detail_params

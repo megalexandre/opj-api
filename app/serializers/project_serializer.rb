@@ -37,7 +37,7 @@ class ProjectSerializer
       updated_at: @project.updated_at,
       created_by: @project.created_by,
       updated_by: @project.updated_by,
-      editable: Current.user&.admin?
+      editable: Current.user.present? && ProjectPolicy.new(Current.user, @project).allowed?(:update)
     }
   end
 

@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Access Control', type: :request do
   let(:main_user) { create(:user, profile: 'admin') }
-  let(:user_a)    { create(:user, profile: 'user') }
-  let(:user_b)    { create(:user, profile: 'user') }
+  let(:user_a)    { create(:user, profile: 'integrator') }
+  let(:user_b)    { create(:user, profile: 'integrator') }
 
   let(:main_headers) { { 'Authorization' => auth_token_for(main_user) } }
   let(:headers_a)    { { 'Authorization' => auth_token_for(user_a) } }
@@ -274,25 +274,108 @@ RSpec.describe 'Access Control', type: :request do
   describe 'POST /auth/register' do
     it 'unauthenticated user gets 401' do
       post '/auth/register',
-           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'integrator' }.to_json,
            headers: { 'Content-Type' => 'application/json' }
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'regular user gets 403' do
       post '/auth/register',
-           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'integrator' }.to_json,
            headers: headers_a.merge('Content-Type' => 'application/json')
       expect(response).to have_http_status(:forbidden)
     end
 
     it 'admin can create a new user' do
       post '/auth/register',
-           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'user' }.to_json,
+           params: { name: 'New User', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123', profile: 'integrator' }.to_json,
            headers: main_headers.merge('Content-Type' => 'application/json')
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
-      expect(body['user']['profile']).to eq('user')
+      expect(body['user']['profile']).to eq('integrator')
+    end
+  end
+
+  describe 'integrator assigned to a project created by the admin' do
+    let(:json_headers) { headers_a.merge('Content-Type' => 'application/json') }
+    let!(:assigned_project) do
+      Current.user = main_user
+      create(:project, integrator: user_a.id).tap { Current.user = nil }
+    end
+    let!(:admin_ledger) do
+      Current.user = main_user
+      create(:ledger, project: assigned_project).tap { Current.user = nil }
+    end
+
+    it 'sees the ledgers of the project' do
+      get '/ledgers', headers: headers_a
+      expect(JSON.parse(response.body).pluck('id')).to include(admin_ledger.id)
+    end
+
+    it 'filters paginated ledgers by the project' do
+      get '/ledgers/paginate', params: { project_id: assigned_project.id }, headers: headers_a
+      expect(JSON.parse(response.body)['content'].pluck('id')).to eq([admin_ledger.id])
+    end
+
+    it 'can show a ledger of the project' do
+      get "/ledgers/#{admin_ledger.id}", headers: headers_a
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'cannot change a ledger created by someone else' do
+      patch "/ledgers/#{admin_ledger.id}", params: { description: 'x' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'can create a ledger on the project' do
+      post '/ledgers', params: { project_id: assigned_project.id, amount: '10,00' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'cannot see the ledgers of a project it is not assigned to' do
+      get "/ledgers/#{admin_ledger.id}", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'cannot create a ledger on a project it is not assigned to' do
+      post '/ledgers', params: { project_id: assigned_project.id, amount: '10,00' }.to_json,
+                       headers: headers_b.merge('Content-Type' => 'application/json')
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'sees the calendar events of the project' do
+      Current.user = main_user
+      event = create(:calendar_event, project: assigned_project)
+      Current.user = nil
+
+      get '/calendar_events', headers: headers_a
+      expect(JSON.parse(response.body).pluck('id')).to include(event.id)
+    end
+
+    it 'sees the uploads of the project' do
+      Current.user = main_user
+      upload = create(:upload, item_id: assigned_project.id)
+      Current.user = nil
+
+      get '/uploads', params: { item_id: assigned_project.id }, headers: headers_a
+      expect(JSON.parse(response.body).pluck('id')).to eq([upload.id])
+    end
+
+    it 'can show the client of the project but not change it' do
+      get "/customers/#{assigned_project.client_id}", headers: headers_a
+      expect(response).to have_http_status(:ok)
+
+      patch "/customers/#{assigned_project.client_id}", params: { name: 'x' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'cannot edit a status comment written by someone else' do
+      status = create(:project_status, project: assigned_project)
+      comment = create(:project_status_comment, project_status: status, created_by: main_user.id)
+
+      patch "/projects/#{assigned_project.id}/statuses/#{status.id}/comments/#{comment.id}",
+            params: { body: 'x' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

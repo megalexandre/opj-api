@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
-  before_action :require_main_profile!
+  before_action -> { authorize!(User) }
   before_action :set_user, only: %i[destroy reset_password]
 
   def destroy
@@ -22,7 +22,7 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = authorize!(User.find(params[:id]))
   end
 
   def reset_password_params
@@ -31,9 +31,5 @@ class UsersController < ApplicationController
 
   def user_json(user)
     user.as_json(only: %i[id name email profile created_at updated_at])
-  end
-
-  def require_main_profile!
-    render json: { message: 'Forbidden' }, status: :forbidden unless current_user.admin?
   end
 end

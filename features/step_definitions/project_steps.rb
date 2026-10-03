@@ -11,7 +11,7 @@ Dado('que estou autenticado como usuário') do
 end
 
 Dado('que estou autenticado como administrador') do
-  @user = create(:user, profile: 'main')
+  @user = create(:user, profile: 'admin')
   set_auth_header(@user)
   Current.user = @user
 end

@@ -2,12 +2,14 @@
 
 class UploadsController < ApplicationController
   before_action :set_upload, only: %i[download destroy]
+  before_action -> { authorize!(Upload) }, only: %i[index create destroy_by_item]
 
   # POST /uploads
   # multipart: item_id + files[] (um ou mais arquivos)
   def create
     item_id = params.expect(:item_id)
     files   = Array(params[:files])
+    authorize_item!(item_id)
 
     storage = StorageService.new
     uploads = files.map do |file|
@@ -28,8 +30,7 @@ class UploadsController < ApplicationController
 
   # GET /uploads?item_id=<uuid>
   def index
-    item_id  = params.expect(:item_id)
-    @uploads = upload_scope_for(item_id)
+    @uploads = policy_scope(Upload.where(item_id: params.expect(:item_id)))
     render json: @uploads.map { |u| UploadSerializer.new(u).as_json }
   end
 
@@ -49,43 +50,24 @@ class UploadsController < ApplicationController
 
   # DELETE /uploads/by_item/:item_id
   def destroy_by_item
-    uploads = Upload.where(item_id: params.expect(:item_id))
-    count   = uploads.count
+    uploads = policy_scope(Upload.where(item_id: params.expect(:item_id)))
+              .select { policy_for(_1).allowed?(:destroy) }
+    count   = uploads.size
     storage = StorageService.new
     uploads.each { |u| storage.delete(key: u.s3_key) }
-    uploads.delete_all
+    Upload.where(id: uploads.map(&:id)).delete_all
     render json: { deleted: count }
   end
 
   private
 
   def set_upload
-    @upload = Upload.find(params.expect(:id))
-    authorize_upload_access!(@upload)
+    @upload = authorize!(Upload.find(params.expect(:id)))
   end
 
-  def upload_scope_for(item_id)
-    return Upload.where(item_id: item_id) if current_user.admin?
-
-    if Project.where(id: item_id)
-              .where("created_by = :uid OR integrator = :uid", uid: current_user.id)
-              .exists?
-      Upload.where(item_id: item_id)
-    else
-      Upload.where(item_id: item_id, created_by: current_user.id)
-    end
-  end
-
-  def authorize_upload_access!(upload)
-    return if current_user.admin?
-    return if upload.created_by == current_user.id
-
-    if Project.where(id: upload.item_id)
-              .where("created_by = :uid OR integrator = :uid", uid: current_user.id)
-              .exists?
-      return
-    end
-
-    raise ActiveRecord::RecordNotFound
+  # item_id may point at a project or at another kind of record; only projects are checked.
+  def authorize_item!(item_id)
+    project = Project.find_by(id: item_id)
+    authorize!(project, :show) if project
   end
 end

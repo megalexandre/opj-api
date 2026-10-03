@@ -2,16 +2,17 @@
 
 class PriceTablesController < ApplicationController
   before_action :set_price_table, only: %i[show update destroy]
+  before_action -> { authorize!(PriceTable) }, only: %i[index paginate create]
 
   # GET /price_tables/paginate
   def paginate
-    @pagy, @price_tables = pagy(apply_access_scope(scoped_price_tables))
+    @pagy, @price_tables = pagy(policy_scope(scoped_price_tables))
     render_page @pagy, @price_tables, serializer: PriceTableSerializer
   end
 
   # GET /price_tables
   def index
-    @price_tables = apply_access_scope(scoped_price_tables)
+    @price_tables = policy_scope(scoped_price_tables)
     render json: @price_tables.map { PriceTableSerializer.new(_1).as_json }
   end
 
@@ -53,7 +54,7 @@ class PriceTablesController < ApplicationController
 
   def set_price_table
     @price_table = PriceTable.find(params.expect(:id))
-    authorize_record!(@price_table)
+    authorize!(@price_table)
   end
 
   def price_table_params

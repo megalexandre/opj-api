@@ -27,7 +27,7 @@ RSpec.describe 'Auth', type: :request do
       }
 
       response '201', 'usuário criado e token retornado' do
-        let(:credentials) { { name: 'Test User', email: 'test@example.com', profile: 'user', password: 'password123' } }
+        let(:credentials) { { name: 'Test User', email: 'test@example.com', profile: 'integrator', password: 'password123' } }
         schema '$ref' => '#/components/schemas/AuthToken'
         run_test!
       end

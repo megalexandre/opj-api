@@ -7,7 +7,7 @@ Dado('que existe um projeto com um status cadastrado') do
 end
 
 Dado('que existe um comentário cadastrado') do
-  @comment = create(:project_status_comment, project_status: @status)
+  @comment = create(:project_status_comment, project_status: @status, created_by: @user.id)
 end
 
 Então('o status tem {int} comentário') do |count|

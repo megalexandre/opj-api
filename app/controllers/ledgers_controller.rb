@@ -2,16 +2,18 @@
 
 class LedgersController < ApplicationController
   before_action :set_ledger, only: %i[show update destroy]
+  before_action -> { authorize!(Ledger) }, only: %i[index paginate create]
+  before_action -> { authorize_project_reference!(ledger_params[:project_id]) }, only: %i[create update]
 
   # GET /ledgers/paginate
   def paginate
-    @pagy, @ledgers = pagy(apply_access_scope(filtered_ledgers))
+    @pagy, @ledgers = pagy(filtered_ledgers)
     render_page @pagy, @ledgers, serializer: LedgerSerializer
   end
 
   # GET /ledgers
   def index
-    @ledgers = apply_access_scope(Ledger.includes(:project, :service))
+    @ledgers = policy_scope(Ledger.includes(:project, :service))
     render json: @ledgers.map { LedgerSerializer.new(_1).as_json }
   end
 
@@ -49,11 +51,12 @@ class LedgersController < ApplicationController
 
   def set_ledger
     @ledger = Ledger.find(params.expect(:id))
-    authorize_record!(@ledger)
+    authorize!(@ledger)
   end
 
   def filtered_ledgers
-    filter_by_date_range(filter_by_attributes(Ledger.includes(:project, :service))).order(created_at: :desc)
+    scope = policy_scope(Ledger.includes(:project, :service))
+    filter_by_date_range(filter_by_attributes(scope)).order(created_at: :desc)
   end
 
   def filter_by_attributes(scope)

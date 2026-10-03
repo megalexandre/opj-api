@@ -2,6 +2,8 @@
 
 class ProjectStatusCommentsController < ApplicationController
   before_action :set_status
+  before_action -> { authorize!(ProjectStatusComment) }, only: :create
+  before_action :set_comment, only: %i[update destroy]
 
   def create
     comment = @status.comments.create!(
@@ -13,15 +15,13 @@ class ProjectStatusCommentsController < ApplicationController
   end
 
   def update
-    comment = @status.comments.find(params[:id])
-    comment.update!(body: comment_params[:body])
+    @comment.update!(body: comment_params[:body])
 
-    render json: serialize(comment)
+    render json: serialize(@comment)
   end
 
   def destroy
-    comment = @status.comments.find(params[:id])
-    comment.destroy!
+    @comment.destroy!
 
     head :no_content
   end
@@ -30,8 +30,12 @@ class ProjectStatusCommentsController < ApplicationController
 
   def set_status
     project = Project.find(params[:project_id])
-    authorize_project_participant!(project)
+    authorize!(project, :show)
     @status = project.statuses.find(params[:status_id])
+  end
+
+  def set_comment
+    @comment = authorize!(@status.comments.find(params[:id]))
   end
 
   def comment_params

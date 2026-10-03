@@ -2,16 +2,17 @@
 
 class ServicesController < ApplicationController
   before_action :set_service, only: %i[show update destroy]
+  before_action -> { authorize!(Service) }, only: %i[index paginate create]
 
   # GET /services/paginate
   def paginate
-    @pagy, @services = pagy(apply_access_scope(Service.includes(:apportionments, :service_entry_items).all))
+    @pagy, @services = pagy(policy_scope(Service.includes(:apportionments, :service_entry_items).all))
     render_page @pagy, @services, serializer: ServiceSerializer
   end
 
   # GET /services
   def index
-    @services = apply_access_scope(Service.includes(:apportionments, :service_entry_items).all)
+    @services = policy_scope(Service.includes(:apportionments, :service_entry_items).all)
     render json: @services.map { ServiceSerializer.new(_1).as_json }
   end
 
@@ -49,7 +50,7 @@ class ServicesController < ApplicationController
 
   def set_service
     @service = Service.includes(:apportionments, :service_entry_items).find(params.expect(:id))
-    authorize_record!(@service)
+    authorize!(@service)
   end
 
   def service_params

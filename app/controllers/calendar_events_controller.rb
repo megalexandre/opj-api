@@ -2,10 +2,12 @@
 
 class CalendarEventsController < ApplicationController
   before_action :set_calendar_event, only: %i[show update destroy]
+  before_action -> { authorize!(CalendarEvent) }, only: %i[index create]
+  before_action -> { authorize_project_reference!(calendar_event_params[:project_id]) }, only: %i[create update]
 
   # GET /calendar_events?from=2026-07-01&to=2026-07-31
   def index
-    calendar_events = filter_by_date_range(apply_access_scope(CalendarEvent.all)).order(date: :asc)
+    calendar_events = filter_by_date_range(policy_scope(CalendarEvent.all)).order(date: :asc)
     render json: calendar_events.map { CalendarEventSerializer.new(_1).as_json }
   end
 
@@ -43,7 +45,7 @@ class CalendarEventsController < ApplicationController
 
   def set_calendar_event
     @calendar_event = CalendarEvent.find(params.expect(:id))
-    authorize_record!(@calendar_event)
+    authorize!(@calendar_event)
   end
 
   def filter_by_date_range(scope)
