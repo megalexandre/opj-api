@@ -53,6 +53,14 @@ gem 'money-rails'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+# Métricas Prometheus (exporter em :9394, coletado pelo Prometheus/Grafana no Coolify)
+gem 'yabeda-activejob'
+gem 'yabeda-activerecord'
+gem 'yabeda-gc'
+gem 'yabeda-prometheus'
+gem 'yabeda-puma-plugin'
+gem 'yabeda-rails'
+
 gem 'dotenv-rails', groups: %i[development test]
 
 group :development do

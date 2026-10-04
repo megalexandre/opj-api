@@ -71,4 +71,6 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
+# Métricas Prometheus (só rede interna; não publicar esta porta)
+EXPOSE 9394
 CMD ["./bin/thrust", "./bin/rails", "server"]

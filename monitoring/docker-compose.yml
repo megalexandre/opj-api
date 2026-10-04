@@ -1,0 +1,37 @@
+# Stack de monitoramento da OPJ API (Prometheus + Grafana) para o Coolify.
+# No Coolify: crie um recurso "Docker Compose" apontando para este arquivo e
+# ative "Connect to Predefined Network" para o Prometheus alcançar a API.
+# Detalhes no README, seção "Observabilidade".
+services:
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=30d
+    # Necessário para descobrir o container da API (o nome muda a cada deploy).
+    # Rodar como root só para ler o socket do Docker, que é montado read-only.
+    user: root
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      - SERVICE_FQDN_GRAFANA_3000
+      - GF_SERVER_ROOT_URL=${SERVICE_FQDN_GRAFANA:-http://localhost:3000}
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${SERVICE_PASSWORD_GRAFANA:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:
