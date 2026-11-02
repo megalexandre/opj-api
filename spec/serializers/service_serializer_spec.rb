@@ -20,6 +20,16 @@ RSpec.describe ServiceSerializer do
     expect(json[:coordinates]).to eq(latitude: -19.9, longitude: -43.9)
   end
 
+  it 'serializes the assigned integrator' do
+    integrator = create(:user, name: 'Integrador X')
+    service.update!(integrator: integrator.id)
+    expect(json).to include(integrator: integrator.id, integrator_name: 'Integrador X')
+  end
+
+  it 'returns nil integrator_name when unassigned' do
+    expect(json).to include(integrator: nil, integrator_name: nil)
+  end
+
   it 'returns nil coordinates when absent' do
     service.update!(coordinates: nil)
     expect(json[:coordinates]).to be_nil

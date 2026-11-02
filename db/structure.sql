@@ -351,7 +351,8 @@ CREATE TABLE public.services (
     approval_status character varying,
     document_category character varying,
     reused_documents character varying,
-    subsequence character varying
+    subsequence character varying,
+    integrator uuid
 );
 
 
@@ -708,6 +709,13 @@ CREATE INDEX index_services_on_generating_address_id ON public.services USING bt
 
 
 --
+-- Name: index_services_on_integrator; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_services_on_integrator ON public.services USING btree (integrator);
+
+
+--
 -- Name: index_technical_details_on_project_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -806,6 +814,14 @@ ALTER TABLE ONLY public.project_statuses
 
 ALTER TABLE ONLY public.customers
     ADD CONSTRAINT fk_rails_3f9404ba26 FOREIGN KEY (address_id) REFERENCES public.addresses(id);
+
+
+--
+-- Name: services fk_rails_41d2b3e158; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.services
+    ADD CONSTRAINT fk_rails_41d2b3e158 FOREIGN KEY (integrator) REFERENCES public.users(id);
 
 
 --
@@ -983,6 +999,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO "$user", public, tiger, topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261102130000'),
 ('20261102120000'),
 ('20260929120000'),
 ('20260928120000'),

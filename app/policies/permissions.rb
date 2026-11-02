@@ -28,7 +28,7 @@ module Permissions
       upload: { index: :any, show: :any, create: :any, destroy: :own },
       customer: { index: :any, show: :any, create: :any, update: :own, destroy: :own },
       address: { index: :any, show: :any, create: :any, update: :own, destroy: :own },
-      service: CRUD,
+      service: { index: :any, show: :any, create: :any, update: :own, destroy: :own },
       concessionaire: { index: :any, show: :any, create: :any, update: :own, destroy: :own },
       price_table: CRUD
     }

@@ -378,4 +378,78 @@ RSpec.describe 'Access Control', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  describe 'service transferred to an integrator' do
+    let(:json_headers) { headers_a.merge('Content-Type' => 'application/json') }
+    let!(:assigned_service) do
+      Current.user = main_user
+      create(:service, integrator: user_a.id, construction_address: create(:address)).tap { Current.user = nil }
+    end
+
+    it 'admin can transfer a service to another integrator' do
+      patch "/services/#{assigned_service.id}",
+            params: { integrator: user_b.id }.to_json,
+            headers: main_headers.merge('Content-Type' => 'application/json')
+
+      body = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      expect(body).to include('integrator' => user_b.id, 'integrator_name' => user_b.name)
+    end
+
+    it 'integrator sees the service in the list' do
+      get '/services', headers: headers_a
+      expect(JSON.parse(response.body).pluck('id')).to eq([assigned_service.id])
+    end
+
+    it 'integrator can show the service' do
+      get "/services/#{assigned_service.id}", headers: headers_a
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'integrator cannot update the service' do
+      patch "/services/#{assigned_service.id}", params: { observations: 'x' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'integrator cannot delete the service' do
+      delete "/services/#{assigned_service.id}", headers: headers_a
+      expect(response).to have_http_status(:forbidden)
+      expect(Service.exists?(assigned_service.id)).to be(true)
+    end
+
+    it 'other integrators still get 404' do
+      get "/services/#{assigned_service.id}", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'loses access once the service is transferred away' do
+      assigned_service.update_columns(integrator: user_b.id)
+
+      get "/services/#{assigned_service.id}", headers: headers_a
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'sees the ledgers of the service' do
+      Current.user = main_user
+      ledger = create(:ledger, service: assigned_service).tap { Current.user = nil }
+
+      get '/ledgers', headers: headers_a
+      expect(JSON.parse(response.body).pluck('id')).to include(ledger.id)
+    end
+
+    it 'can show the customer of the service but not change it' do
+      get "/customers/#{assigned_service.customer_id}", headers: headers_a
+      expect(response).to have_http_status(:ok)
+
+      patch "/customers/#{assigned_service.customer_id}", params: { name: 'x' }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'can show the addresses of the service and of its customer' do
+      [assigned_service.construction_address_id, assigned_service.customer.address_id].each do |address_id|
+        get "/addresses/#{address_id}", headers: headers_a
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

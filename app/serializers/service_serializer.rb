@@ -24,6 +24,7 @@ class ServiceSerializer
     document_category
     reused_documents
     subsequence
+    integrator
     created_at
     updated_at
     created_by
@@ -38,6 +39,7 @@ class ServiceSerializer
     ATTRIBUTES
       .index_with { @service.public_send(_1) }
       .merge(
+        integrator_name: @service.integrator_user&.name,
         coordinates: serialize_coordinates(@service.coordinates),
         apportionments: serialize_apportionments,
         service_entry_items: serialize_service_entry_items

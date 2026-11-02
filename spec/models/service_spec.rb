@@ -8,6 +8,7 @@ RSpec.describe Service, type: :model do
     it { is_expected.to belong_to(:concessionaire) }
     it { is_expected.to belong_to(:construction_address).class_name('Address').optional }
     it { is_expected.to belong_to(:generating_address).class_name('Address').optional }
+    it { is_expected.to belong_to(:integrator_user).class_name('User').optional }
     it { is_expected.to have_many(:apportionments).dependent(:destroy) }
     it { is_expected.to have_many(:service_entry_items).dependent(:destroy) }
     it { is_expected.to accept_nested_attributes_for(:apportionments).allow_destroy(true) }
@@ -40,6 +41,30 @@ RSpec.describe Service, type: :model do
     it 'sets created_by and updated_by from the current user' do
       service = create(:service)
       expect([service.created_by, service.updated_by]).to eq([user.id, user.id])
+    end
+  end
+
+  describe '.visible_to' do
+    let(:owner)      { create(:user) }
+    let(:integrator) { create(:user) }
+    let(:other)      { create(:user) }
+    let(:admin)      { create(:user, profile: 'admin') }
+    let!(:service) do
+      Current.user = owner
+      create(:service, integrator: integrator.id).tap { Current.user = nil }
+    end
+
+    it 'includes services created by or assigned to the user' do
+      expect(described_class.visible_to(owner)).to eq([service])
+      expect(described_class.visible_to(integrator)).to eq([service])
+    end
+
+    it 'excludes services of unrelated integrators' do
+      expect(described_class.visible_to(other)).to be_empty
+    end
+
+    it 'includes everything for admins' do
+      expect(described_class.visible_to(admin)).to eq([service])
     end
   end
 

@@ -68,5 +68,9 @@ class ApplicationPolicy
     def visible_project_ids
       Project.visible_to(user).select(:id)
     end
+
+    def visible_service_ids
+      Service.visible_to(user).select(:id)
+    end
   end
 end

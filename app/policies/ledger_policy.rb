@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class LedgerPolicy < ApplicationPolicy
-  # Records of any project visible to the user, plus the ones they created.
+  # Records of any project or service visible to the user, plus the ones they created.
   class Scope < ApplicationPolicy::Scope
     def resolve
       return relation if user.admin?
 
-      relation.where(project_id: visible_project_ids).or(relation.where(created_by: user.id))
+      relation.where(project_id: visible_project_ids)
+              .or(relation.where(service_id: visible_service_ids))
+              .or(relation.where(created_by: user.id))
     end
   end
 end

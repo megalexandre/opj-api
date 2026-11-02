@@ -49,6 +49,7 @@ RSpec.describe 'Services', type: :request do
           document_category: { type: :string },
           reused_documents: { type: :string },
           subsequence: { type: :string },
+          integrator: { type: :string, format: :uuid, nullable: true },
           apportionments_attributes: {
             type: :array,
             items: {
@@ -164,7 +165,8 @@ RSpec.describe 'Services', type: :request do
           service_type: { type: :string },
           observations: { type: :string },
           amount: { type: :string },
-          subsequence: { type: :string }
+          subsequence: { type: :string },
+          integrator: { type: :string, format: :uuid, nullable: true }
         }
       }
 

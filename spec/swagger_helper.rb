@@ -320,6 +320,8 @@ RSpec.configure do |config|
               document_category: { type: :string, nullable: true },
               reused_documents: { type: :string, nullable: true },
               subsequence: { type: :string, nullable: true },
+              integrator: { type: :string, format: :uuid, nullable: true },
+              integrator_name: { type: :string, nullable: true },
               apportionments: { type: :array, items: { '$ref' => '#/components/schemas/Apportionment' } },
               service_entry_items: { type: :array,
                                      items: { '$ref' => '#/components/schemas/ServiceEntryItem' } },

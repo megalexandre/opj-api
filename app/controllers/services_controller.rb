@@ -7,7 +7,7 @@ class ServicesController < ApplicationController
     generating_consumer_unit pole_distance_over_30m
     construction_address_id generating_address_id
     protocol status timeline timeline_comments reference_point
-    approval_status document_category reused_documents subsequence
+    approval_status document_category reused_documents subsequence integrator
   ].freeze
 
   PERMITTED_NESTED_ATTRIBUTES = {
@@ -20,13 +20,13 @@ class ServicesController < ApplicationController
 
   # GET /services/paginate
   def paginate
-    @pagy, @services = pagy(policy_scope(Service.includes(:apportionments, :service_entry_items).all))
+    @pagy, @services = pagy(policy_scope(services_with_associations))
     render_page @pagy, @services, serializer: ServiceSerializer
   end
 
   # GET /services
   def index
-    @services = policy_scope(Service.includes(:apportionments, :service_entry_items).all)
+    @services = policy_scope(services_with_associations)
     render json: @services.map { ServiceSerializer.new(_1).as_json }
   end
 
@@ -63,8 +63,12 @@ class ServicesController < ApplicationController
   private
 
   def set_service
-    @service = Service.includes(:apportionments, :service_entry_items).find(params.expect(:id))
+    @service = services_with_associations.find(params.expect(:id))
     authorize!(@service)
+  end
+
+  def services_with_associations
+    Service.includes(:integrator_user, :apportionments, :service_entry_items)
   end
 
   def service_params
