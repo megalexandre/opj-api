@@ -107,14 +107,23 @@ bin/rails s && curl localhost:9394/metrics
 
 ### Prometheus + Grafana no Coolify
 
-A stack fica em [`monitoring/`](monitoring/) e já vem com o datasource e o dashboard **OPJ API** provisionados.
+Em produção: **https://grafana.projetosopjengenharia.com.br** (usuário `admin`, senha em `SERVICE_PASSWORD_GRAFANA` no Coolify).
 
-1. No Coolify, crie um recurso **Docker Compose** a partir deste repositório, com o arquivo `monitoring/docker-compose.yml`.
+A pasta [`monitoring/`](monitoring/) tem dois arquivos:
+
+- `docker-compose.yml`: Prometheus + Grafana, com a config do Prometheus, o datasource e o dashboard **OPJ API** embutidos via `content:` (extensão do Coolify).
+- `opj-api-endpoints.json`: o dashboard **OPJ API – Endpoints** (latência e erros por rota). Ele usa `$__range`, que o compose interpretaria como variável, por isso não vai embutido. Importe em *Dashboards → New → Import*, na pasta **OPJ**.
+
+Para subir ou atualizar:
+
+1. No Coolify, use **+ New → Docker Compose Empty** (ou, num stack existente, **Edit Compose File**) e cole `monitoring/docker-compose.yml`.
 2. Ative **Connect to Predefined Network**, para o Prometheus entrar na rede `coolify`, a mesma da API.
-3. Configure o domínio do serviço `grafana`. O Coolify gera a senha do `admin` (`SERVICE_PASSWORD_GRAFANA`).
+3. Configure o domínio do serviço `grafana` com a porta interna: `https://grafana.projetosopjengenharia.com.br:3000`.
 4. Não publique a porta 9394 da API. O Prometheus acessa a API pela rede interna.
 
-O Prometheus descobre o container da API pelo socket do Docker, filtrando pela imagem `alexandreqrz/opjapi:latest`, porque o Coolify troca o nome do container a cada deploy. Se a API passar a usar outra tag, ajuste o filtro em `monitoring/prometheus.yml`.
+Os dados ficam nos volumes `prometheus-data` (30 dias) e `grafana-data`, que sobrevivem a redeploys.
+
+O Prometheus descobre o container da API pelo socket do Docker, filtrando pela imagem `alexandreqrz/opjapi:latest`, porque o Coolify troca o nome do container a cada deploy. Se a API passar a usar outra tag, ajuste o filtro no `prometheus.yml` embutido no compose.
 
 > Com `WEB_CONCURRENCY` > 1 (Puma em cluster), cada worker tem as próprias métricas em memória. Nesse caso, configure o `Prometheus::Client::DataStores::DirectFileStore` para agregar entre workers. Jobs executados pelo supervisor do Solid Queue rodam em processos separados, então só as métricas de enfileiramento aparecem.
 
