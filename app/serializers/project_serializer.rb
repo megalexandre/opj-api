@@ -44,7 +44,7 @@ class ProjectSerializer
   private
 
   def serialize_statuses(statuses)
-    statuses.order(created_at: :asc).map do |s|
+    statuses.sort_by(&:created_at).map do |s|
       {
         id: s.id,
         name: s.name,

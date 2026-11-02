@@ -6,7 +6,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   def index
-    @projects = policy_scope(Project.includes(:integrator_user, statuses: :comments))
+    @projects = policy_scope(Project.includes(:integrator_user, client: :address, statuses: :comments))
 
     render json: @projects.map { |p| ProjectSerializer.new(p).as_json }
   end

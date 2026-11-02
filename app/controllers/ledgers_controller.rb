@@ -13,7 +13,7 @@ class LedgersController < ApplicationController
 
   # GET /ledgers
   def index
-    @ledgers = policy_scope(Ledger.includes(:project, :service))
+    @ledgers = policy_scope(ledgers_with_associations)
     render json: @ledgers.map { LedgerSerializer.new(_1).as_json }
   end
 
@@ -54,8 +54,17 @@ class LedgersController < ApplicationController
     authorize!(@ledger)
   end
 
+  # Everything LedgerSerializer embeds (full project and service), so listing
+  # ledgers runs a fixed number of queries.
+  def ledgers_with_associations
+    Ledger.includes(
+      project: [:integrator_user, { client: :address, statuses: :comments }],
+      service: %i[integrator_user apportionments service_entry_items]
+    )
+  end
+
   def filtered_ledgers
-    scope = policy_scope(Ledger.includes(:project, :service))
+    scope = policy_scope(ledgers_with_associations)
     filter_by_date_range(filter_by_attributes(scope)).order(created_at: :desc)
   end
 

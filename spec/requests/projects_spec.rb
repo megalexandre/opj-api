@@ -179,4 +179,40 @@ RSpec.describe 'Projects', type: :request do
       end
     end
   end
+
+  describe 'GET /projects performance' do
+    let(:headers) { { 'Authorization' => auth_token_for(user) } }
+
+    def create_projects(count)
+      count.times do
+        project = create(:project, integrator: create(:user).id)
+        create(:project_status, project: project).tap { create(:project_status_comment, project_status: _1) }
+      end
+    end
+
+    def queries_for_index
+      count = 0
+      counter = ->(*, payload) { count += 1 unless payload[:name] == 'SCHEMA' }
+      ActiveSupport::Notifications.subscribed(counter, 'sql.active_record') { get '/projects', headers: headers }
+      count
+    end
+
+    it 'does not run extra queries per project' do
+      create_projects(2)
+      baseline = queries_for_index
+
+      create_projects(5)
+      expect(queries_for_index).to eq(baseline)
+    end
+
+    it 'returns statuses ordered by creation' do
+      project = create(:project)
+      newer = create(:project_status, project: project, created_at: 1.hour.ago)
+      older = create(:project_status, project: project, created_at: 2.hours.ago)
+
+      get '/projects', headers: headers
+      statuses = JSON.parse(response.body).find { _1['id'] == project.id }['statuses']
+      expect(statuses.pluck('id')).to eq([older.id, newer.id])
+    end
+  end
 end

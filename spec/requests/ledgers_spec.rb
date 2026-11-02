@@ -233,4 +233,37 @@ RSpec.describe 'Ledgers', type: :request do
   def response_body
     JSON.parse(response.body)
   end
+
+  describe 'performance' do
+    let(:headers) { { 'Authorization' => auth_token_for(user) } }
+
+    def create_ledgers(count)
+      count.times do
+        project = create(:project, integrator: create(:user).id)
+        create(:project_status, project: project).tap { create(:project_status_comment, project_status: _1) }
+        service = create(:service, integrator: create(:user).id)
+        create(:apportionment, service: service)
+        create(:service_entry_item, service: service)
+        create(:ledger, project: project)
+        create(:ledger, service: service)
+      end
+    end
+
+    def queries_for(path)
+      count = 0
+      counter = ->(*, payload) { count += 1 unless payload[:name] == 'SCHEMA' }
+      ActiveSupport::Notifications.subscribed(counter, 'sql.active_record') { get path, headers: headers }
+      count
+    end
+
+    %w[/ledgers /ledgers/paginate].each do |path|
+      it "does not run extra queries per ledger on #{path}" do
+        create_ledgers(1)
+        baseline = queries_for(path)
+
+        create_ledgers(4)
+        expect(queries_for(path)).to eq(baseline)
+      end
+    end
+  end
 end
