@@ -350,7 +350,8 @@ CREATE TABLE public.services (
     reference_point character varying,
     approval_status character varying,
     document_category character varying,
-    reused_documents character varying
+    reused_documents character varying,
+    subsequence character varying
 );
 
 
@@ -982,6 +983,7 @@ ALTER TABLE ONLY public.projects
 SET search_path TO "$user", public, tiger, topology;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261102120000'),
 ('20260929120000'),
 ('20260928120000'),
 ('20260825120000'),

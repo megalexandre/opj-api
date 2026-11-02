@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.configure do |config|
-  config.openapi_root = Rails.root.to_s + '/swagger'
+  config.openapi_root = Rails.root.join('swagger').to_s
 
   config.openapi_specs = {
     'v1/swagger.yaml' => {
@@ -319,6 +319,7 @@ RSpec.configure do |config|
               approval_status: { type: :string, nullable: true },
               document_category: { type: :string, nullable: true },
               reused_documents: { type: :string, nullable: true },
+              subsequence: { type: :string, nullable: true },
               apportionments: { type: :array, items: { '$ref' => '#/components/schemas/Apportionment' } },
               service_entry_items: { type: :array,
                                      items: { '$ref' => '#/components/schemas/ServiceEntryItem' } },

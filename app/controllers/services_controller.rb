@@ -1,6 +1,20 @@
 # frozen_string_literal: true
 
 class ServicesController < ApplicationController
+  PERMITTED_ATTRIBUTES = %i[
+    service_type customer_id concessionaire_id opening_date amount
+    discount_coupon_percentage observations supply_voltage coordinates
+    generating_consumer_unit pole_distance_over_30m
+    construction_address_id generating_address_id
+    protocol status timeline timeline_comments reference_point
+    approval_status document_category reused_documents subsequence
+  ].freeze
+
+  PERMITTED_NESTED_ATTRIBUTES = {
+    apportionments_attributes: %i[id consumer_unit address classification percentage _destroy],
+    service_entry_items_attributes: %i[id connection_type classification quantity circuit_breaker _destroy]
+  }.freeze
+
   before_action :set_service, only: %i[show update destroy]
   before_action -> { authorize!(Service) }, only: %i[index paginate create]
 
@@ -54,19 +68,6 @@ class ServicesController < ApplicationController
   end
 
   def service_params
-    params.permit(
-      :service_type, :customer_id, :concessionaire_id, :opening_date, :amount,
-      :discount_coupon_percentage, :observations, :supply_voltage, :coordinates,
-      :generating_consumer_unit, :pole_distance_over_30m,
-      :construction_address_id, :generating_address_id,
-      :protocol, :status, :timeline, :timeline_comments, :reference_point,
-      :approval_status, :document_category, :reused_documents,
-      apportionments_attributes: %i[
-        id consumer_unit address classification percentage _destroy
-      ],
-      service_entry_items_attributes: %i[
-        id connection_type classification quantity circuit_breaker _destroy
-      ]
-    )
+    params.permit(*PERMITTED_ATTRIBUTES, **PERMITTED_NESTED_ATTRIBUTES)
   end
 end

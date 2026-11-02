@@ -89,4 +89,5 @@ group :test do
   gem 'cucumber-rails', require: false
   gem 'database_cleaner-active_record'
   gem 'shoulda-matchers'
+  gem 'simplecov', require: false
 end

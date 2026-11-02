@@ -3,3 +3,8 @@ AllCops:
 
 Style/Documentation:
   Enabled: false
+
+# RSpec/rswag DSL blocks (describe, path, response) are long by nature.
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
